@@ -1,53 +1,78 @@
 import 'package:flutter/material.dart';
-import '../../services/tv_service.dart';
 
-class SeasonDetailsPage extends StatefulWidget {
+const String baseImg = 'https://image.tmdb.org/t/p/w500';
+
+class SeasonDetailsPage extends StatelessWidget {
   final int tvId;
   final int seasonNumber;
-  const SeasonDetailsPage({super.key, required this.tvId, required this.seasonNumber});
+  final Map<String, dynamic> seasonData;
 
-  @override
-  State<SeasonDetailsPage> createState() => _SeasonDetailsPageState();
-}
-
-class _SeasonDetailsPageState extends State<SeasonDetailsPage> {
-  Map season = {};
-  bool loading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  Future<void> _load() async {
-    setState(() => loading = true);
-    season = await TvService.seasonDetails(widget.tvId, widget.seasonNumber);
-    setState(() => loading = false);
-  }
+  const SeasonDetailsPage({
+    super.key,
+    required this.tvId,
+    required this.seasonNumber,
+    required this.seasonData,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final episodes = seasonData['episodes'] as List? ?? [];
+    final poster = seasonData['poster_path'];
+
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(backgroundColor: Colors.black, title: Text(season['name'] ?? 'Season', style: const TextStyle(color: Color(0xFF53fc18)))),
-      body: loading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                if (season['poster_path'] != null) Image.network(TvService.getImageUrl(season['poster_path'])),
-                const SizedBox(height: 12),
-                Text(season['overview'] ?? '', style: const TextStyle(color: Colors.white)),
-                const SizedBox(height: 12),
-                Text('Episodes: ${((season['episodes'] ?? []) as List).length}', style: const TextStyle(color: Color(0xFF53fc18))),
-                const SizedBox(height: 12),
-                ...((season['episodes'] ?? []) as List).map((e) => ListTile(
-                      title: Text(e['name'] ?? '', style: const TextStyle(color: Color(0xFF53fc18))),
-                      subtitle: Text(e['overview'] ?? '', style: const TextStyle(color: Colors.white)),
-                    ))
-              ]),
-            ),
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        title: Text(seasonData['name'] ?? 'Season $seasonNumber', style: const TextStyle(color: Color(0xFF53FC18))),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (poster != null)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network('$baseImg$poster', height: 250, width: double.infinity, fit: BoxFit.cover),
+              )
+            else
+              Container(height: 250, color: Colors.grey.shade800),
+            const SizedBox(height: 12),
+            Text(seasonData['name'] ?? '', style: const TextStyle(color: Color(0xFF53FC18), fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Text(seasonData['overview'] ?? '', style: const TextStyle(color: Colors.white70)),
+            const SizedBox(height: 12),
+            const Text('Episodes', style: TextStyle(color: Color(0xFF53FC18), fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            ...episodes.map((ep) {
+              return Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade900,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Ep. ${ep['episode_number']} - ${ep['name'] ?? 'Unknown'}',
+                      style: const TextStyle(color: Color(0xFF53FC18), fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      ep['overview'] ?? 'No description',
+                      style: const TextStyle(color: Colors.white70),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ],
+        ),
+      ),
     );
   }
 }
