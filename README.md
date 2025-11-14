@@ -1,4 +1,18 @@
 # movie_app
+## Environment variables
+
+This project uses a `.env` file to store API keys and secrets locally.
+
+- Copy `.env.example` to `.env` at the project root:
+
+```
+cp .env.example .env
+```
+
+- Edit `.env` and fill your real TMDB API key (and Firebase keys if you choose). The `.env` file is already ignored by `.gitignore` to avoid leaking secrets.
+
+The app loads environment variables at startup (via `flutter_dotenv`), and services read `TMDB_API_KEY` from the environment. If the environment variable is missing, a built-in fallback key will be used.
+
 
 A new Flutter project.
 
