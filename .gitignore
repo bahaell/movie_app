@@ -56,6 +56,7 @@ app.*.map.json
 local.properties
 android/key.properties
 *.jks
+.env
 
 # iOS
 ios/Flutter/Flutter.framework

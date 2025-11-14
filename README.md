@@ -9,9 +9,25 @@ This project uses a `.env` file to store API keys and secrets locally.
 cp .env.example .env
 ```
 
-- Edit `.env` and fill your real TMDB API key (and Firebase keys if you choose). The `.env` file is already ignored by `.gitignore` to avoid leaking secrets.
+- Edit `.env` and fill your real TMDB API key and (optionally) Firebase web keys. For Flutter web you must provide the Firebase web config values (see below). The `.env` file is already ignored by `.gitignore` to avoid leaking secrets.
 
 The app loads environment variables at startup (via `flutter_dotenv`), and services read `TMDB_API_KEY` from the environment. If the environment variable is missing, a built-in fallback key will be used.
+
+Firebase web configuration
+
+- To run the app on Flutter web, add your Firebase web config to `.env` (these values come from Firebase Console → Project Settings → Your apps (Web)):
+
+```
+FIREBASE_API_KEY=AIzaSyYourApiKeyHere
+FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+FIREBASE_PROJECT_ID=your-project-id
+FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+FIREBASE_MESSAGING_SENDER_ID=1234567890
+FIREBASE_APP_ID=1:1234567890:web:abcdef123456
+FIREBASE_MEASUREMENT_ID=G-ABCDEFG123
+```
+
+- Important: DO NOT commit your `.env` file. Keep it local and secure.
 
 
 A new Flutter project.

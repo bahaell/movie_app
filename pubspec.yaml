@@ -1,0 +1,40 @@
+name: movie_app
+description: Mini project Movie management - Flutter Web + Firebase + TMDB
+publish_to: "none"
+version: 0.0.1
+
+environment:
+  sdk: ">=2.18.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Firebase
+  firebase_core: ^2.13.0
+  firebase_auth: ^4.7.0
+  cloud_firestore: ^4.8.0
+  firebase_storage: ^11.3.0
+
+  # Image & File handling
+  image_picker: ^1.0.4
+  image_picker_web: ^3.0.1
+
+  # HTTP + state mgmt + images
+  http: ^0.13.6
+  provider: ^6.0.6
+  cached_network_image: ^3.2.3
+  flutter_svg: ^2.0.5
+  flutter_dotenv: ^5.0.2
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - .env
+    - .env.example
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0

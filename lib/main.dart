@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/login_page.dart';
@@ -17,18 +18,39 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Load environment variables from .env (do NOT commit the real .env)
-  await dotenv.load(fileName: '.env');
+  // On web, the .env file must be in the web/ folder to be accessible
+  try {
+    if (kIsWeb) {
+      // For web, try loading from the web root
+      await dotenv.load(fileName: '.env');
+    } else {
+      // For mobile, load from project root
+      await dotenv.load(fileName: '.env');
+    }
+  } catch (e) {
+    print('Warning: Could not load .env file: $e');
+    // Continue anyway — fallback values will be used
+  }
 
-  const firebaseOptions = FirebaseOptions(
-    apiKey: "AIzaSyAipS9VCfnpN2PW_INtF6uRkNy5Iy_WKiY",
-    authDomain: "movieapp-64389.firebaseapp.com",
-    projectId: "movieapp-64389",
-    storageBucket: "movieapp-64389.firebasestorage.app",
-    messagingSenderId: "788156325298",
-    appId: "1:788156325298:web:55d57ef97fed61bf7a98ab",
+  // If running on the web we must provide FirebaseOptions. For mobile
+  // (Android/iOS) the native configuration files (google-services.json /
+  // GoogleService-Info.plist) are used and no options are required here.
+  final firebaseOptionsForWeb = FirebaseOptions(
+    apiKey: dotenv.env['FIREBASE_API_KEY']!,
+    authDomain: dotenv.env['FIREBASE_AUTH_DOMAIN']!,
+    projectId: dotenv.env['FIREBASE_PROJECT_ID']!,
+    storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET']!,
+    messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
+    appId: dotenv.env['FIREBASE_APP_ID']!,
+    measurementId: dotenv.env['FIREBASE_MEASUREMENT_ID']!,
   );
 
-  await Firebase.initializeApp(options: firebaseOptions);
+  if (kIsWeb) {
+    await Firebase.initializeApp(options: firebaseOptionsForWeb);
+  } else {
+    await Firebase.initializeApp();
+  }
+
   runApp(const MyApp());
 }
 
