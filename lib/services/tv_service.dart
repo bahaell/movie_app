@@ -17,8 +17,11 @@ class TvService {
   static Future<List> topRated({int page = 1}) async =>
       _get("$base/tv/top_rated?api_key=$apiKey&language=fr-FR&page=$page");
 
-  static Future<Map> details(int id) async =>
-      _getMap("$base/tv/$id?api_key=$apiKey&language=fr-FR");
+  static Future<List> details(int id) async =>
+      _get("$base/tv/$id?api_key=$apiKey&language=fr-FR", listKey: "seasons");
+
+  static Future<List> credits(int id) async =>
+      _get("$base/tv/$id/aggregate_credits?api_key=$apiKey&language=fr-FR", listKey: "cast");
 
   static Future<List> similar(int id) async =>
       _get("$base/tv/$id/similar?api_key=$apiKey&language=fr-FR");

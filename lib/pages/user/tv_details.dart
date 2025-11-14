@@ -46,7 +46,7 @@ class _TvDetailsPageState extends State<TvDetailsPage> {
     }
 
     setState(() {
-      details = d;
+      details = d as Map<String, dynamic>?;
       cast = c;
       similar = s;
       loading = false;
@@ -156,7 +156,7 @@ class _TvDetailsPageState extends State<TvDetailsPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => SeasonDetailsPage(tvId: widget.tvId, seasonNumber: season['season_number'], seasonData: map),
+                      builder: (_) => SeasonDetailsPage(tvId: widget.tvId, seasonNumber: season['season_number'], seasonData: map as Map<String, dynamic>),
                     ),
                   );
                 },
