@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_match.dart';
+import 'movie_service.dart';
+import 'tv_service.dart';
 
 class MatchingService {
   static const double minSimilarityThreshold = 75.0;
@@ -129,6 +131,59 @@ class MatchingService {
     } catch (e) {
       print('Error getting user info: $e');
       return null;
+    }
+  }
+
+  /// Récupère les détails TMDB d'un item (movie ou tv) à partir de son ID formaté
+  /// Format attendu: "movie_550" ou "tv_1256"
+  static Future<Map<String, dynamic>> getItemDetailsFromTMDB(String itemId) async {
+    try {
+      final parts = itemId.split('_');
+      if (parts.length != 2) {
+        print('Invalid item ID format: $itemId');
+        return {};
+      }
+
+      final kind = parts[0]; // "movie" ou "tv"
+      final id = parts[1];
+
+      if (kind == 'movie') {
+        return await MovieService.details(int.parse(id));
+      } else if (kind == 'tv') {
+        return await TvService.details(int.parse(id));
+      }
+
+      return {};
+    } catch (e) {
+      print('Error getting item details from TMDB: $e');
+      return {};
+    }
+  }
+
+  /// Récupère tous les détails TMDB pour une liste d'items communs
+  static Future<List<Map<String, dynamic>>> getCommonItemsDetails(
+    String userId1,
+    String userId2,
+  ) async {
+    try {
+      final commonIds = await getCommonItems(userId1, userId2);
+      final List<Map<String, dynamic>> details = [];
+
+      for (final itemId in commonIds) {
+        final itemDetails = await getItemDetailsFromTMDB(itemId);
+        if (itemDetails.isNotEmpty) {
+          // Ajouter le type et l'ID original pour référence
+          itemDetails['itemId'] = itemId;
+          final kind = itemId.split('_')[0];
+          itemDetails['itemKind'] = kind;
+          details.add(itemDetails);
+        }
+      }
+
+      return details;
+    } catch (e) {
+      print('Error getting common items details: $e');
+      return [];
     }
   }
 }

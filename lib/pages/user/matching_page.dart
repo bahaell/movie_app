@@ -198,12 +198,15 @@ class _MatchingPageState extends State<MatchingPage> {
   }
 
   Widget _buildMatchCard(UserMatch match) {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
+    
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => CommonPlaylistPage(
+              currentUserId: currentUserId,
               otherUserId: match.userId,
               otherUserName: match.userDisplayName ?? 'Unknown',
               similarity: match.similarity,
