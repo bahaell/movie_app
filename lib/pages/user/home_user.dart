@@ -281,6 +281,11 @@ class _HomeUserPageState extends State<HomeUserPage> {
             ),
             icon: const Icon(Icons.search, color: Color(0xFF53FC18)),
           ),
+          IconButton(
+            onPressed: () => Navigator.pushNamed(context, '/matching'),
+            icon: const Icon(Icons.favorite_border, color: Color(0xFF53FC18)),
+            tooltip: 'Find Your Match',
+          ),
         ],
       ),
       body: loading

@@ -12,6 +12,7 @@ import 'pages/user/search_page.dart';
 import 'pages/user/movie_details.dart';
 import 'pages/user/tv_details.dart';
 import 'pages/user/home_user_connected.dart';
+import 'pages/user/matching_page.dart';
 import 'app_theme.dart';
 
 void main() async {
@@ -66,10 +67,10 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => const LoginPage(),
         '/register': (context) => const RegisterPage(),
-  // Use the connected user home as the main user screen (merged skeleton + live data)
-  '/user': (context) => const UserHomePage(),
+        '/user': (context) => const UserHomePage(),
         '/user_connected': (context) => const UserHomePage(),
         '/favorites': (context) => const FavoritesPage(),
+        '/matching': (context) => const MatchingPage(),
         '/admin': (context) => const AdminDashboard(),
         '/search': (context) => const SearchPage(),
         '/movie': (context) {
