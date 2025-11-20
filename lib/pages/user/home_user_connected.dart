@@ -69,6 +69,11 @@ class _UserHomePageState extends State<UserHomePage> {
             icon: const Icon(Icons.favorite, color: Color(0xFF53FC18)),
           ),
           IconButton(
+            tooltip: 'Matching',
+            onPressed: () => Navigator.pushNamed(context, '/matching'),
+            icon: const Icon(Icons.people, color: Color(0xFF53FC18)),
+          ),
+          IconButton(
             tooltip: 'Logout',
             onPressed: () async {
               await FirebaseAuth.instance.signOut();

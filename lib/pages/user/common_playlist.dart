@@ -29,10 +29,29 @@ class _CommonPlaylistPageState extends State<CommonPlaylistPage> {
   @override
   void initState() {
     super.initState();
-    commonItemsFuture = MatchingService.getCommonItemsDetails(
+    commonItemsFuture = _loadCommonItemsDetails();
+  }
+
+  Future<List<Map<String, dynamic>>> _loadCommonItemsDetails() async {
+    // Fetch common item IDs
+    final commonIds = await MatchingService.getCommonItems(
       widget.currentUserId,
       widget.otherUserId,
     );
+
+    // Fetch all details in parallel for better performance
+    final detailFutures = commonIds.map((id) => MatchingService.getItemDetailsFromTMDB(id));
+    final results = await Future.wait(detailFutures);
+
+    // Filter out any empty results and add item metadata
+    final validResults = results.where((res) => res.isNotEmpty).toList();
+    for (var i = 0; i < validResults.length; i++) {
+      final itemId = commonIds.elementAt(i);
+      validResults[i]['itemId'] = itemId;
+      validResults[i]['itemKind'] = itemId.split('_').first;
+    }
+    
+    return validResults;
   }
 
   @override
@@ -41,26 +60,27 @@ class _CommonPlaylistPageState extends State<CommonPlaylistPage> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
+        elevation: 0,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              widget.otherUserName,
+              'In Common with ${widget.otherUserName}',
               style: const TextStyle(
-                color: Color(0xFF53FC18),
+                color: Colors.white,
                 fontWeight: FontWeight.bold,
+                fontSize: 18,
               ),
             ),
             Text(
               '${widget.similarity.toStringAsFixed(1)}% Match',
               style: TextStyle(
-                color: Colors.grey.shade500,
-                fontSize: 12,
+                color: Colors.grey.shade400,
+                fontSize: 14,
               ),
             ),
           ],
         ),
-        elevation: 0,
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: commonItemsFuture,
@@ -74,8 +94,8 @@ class _CommonPlaylistPageState extends State<CommonPlaylistPage> {
           if (snapshot.hasError) {
             return Center(
               child: Text(
-                'Error loading common items: ${snapshot.error}',
-                style: TextStyle(color: Colors.grey.shade400),
+                'Error: ${snapshot.error}',
+                style: const TextStyle(color: Colors.red),
               ),
             );
           }
@@ -87,14 +107,10 @@ class _CommonPlaylistPageState extends State<CommonPlaylistPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.not_interested,
-                    color: Colors.grey.shade600,
-                    size: 60,
-                  ),
+                  Icon(Icons.not_interested, color: Colors.grey.shade600, size: 60),
                   const SizedBox(height: 16),
                   Text(
-                    'No common favorites',
+                    'No common favorites found.',
                     style: TextStyle(color: Colors.grey.shade400, fontSize: 16),
                   ),
                 ],
@@ -102,59 +118,13 @@ class _CommonPlaylistPageState extends State<CommonPlaylistPage> {
             );
           }
 
-          return CustomScrollView(
-            slivers: [
-              // Header with stats
-              SliverToBoxAdapter(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.grey.shade900!, Colors.grey.shade800!],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${commonItems.length} ${commonItems.length == 1 ? 'favorite' : 'favorites'} in common',
-                        style: const TextStyle(
-                          color: Color(0xFF53FC18),
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'You and ${widget.otherUserName} both love these movies & shows',
-                        style: TextStyle(
-                          color: Colors.grey.shade400,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Common items list
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final item = commonItems[index];
-                    return _buildCommonItemCard(item);
-                  },
-                  childCount: commonItems.length,
-                ),
-              ),
-
-              // Bottom padding
-              SliverToBoxAdapter(
-                child: const SizedBox(height: 20),
-              ),
-            ],
+          return ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            itemCount: commonItems.length,
+            itemBuilder: (context, index) {
+              final item = commonItems[index];
+              return _buildCommonItemCard(item);
+            },
           );
         },
       ),
@@ -163,99 +133,71 @@ class _CommonPlaylistPageState extends State<CommonPlaylistPage> {
 
   Widget _buildCommonItemCard(Map<String, dynamic> item) {
     final title = item['title'] ?? item['name'] ?? 'Untitled';
-    final overview = item['overview'] ?? '';
+    final overview = item['overview'] ?? 'No overview available.';
     final posterPath = item['poster_path'];
-    final rating = item['vote_average'] ?? 0.0;
-    final itemId = item['itemId'] as String?;
+    final imageUrl = posterPath != null ? '$baseImg$posterPath' : null;
     final itemKind = item['itemKind'] as String? ?? 'movie';
+    final id = int.tryParse(item['itemId']?.split('_')[1] ?? '');
 
-    final imageUrl =
-        posterPath != null ? '$baseImg$posterPath' : null;
-
-    final id = itemId != null ? int.tryParse(itemId.split('_')[1]) : null;
-
-    return GestureDetector(
-      onTap: () {
-        if (id != null) {
-          if (itemKind == 'movie') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => MovieDetailsPage(movieId: id),
-              ),
-            );
-          } else if (itemKind == 'tv') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => TvDetailsPage(tvId: id),
-              ),
-            );
+    return Card(
+      color: Colors.grey.shade900,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: Colors.grey.shade800),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () {
+          if (id != null) {
+            if (itemKind == 'movie') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => MovieDetailsPage(movieId: id)),
+              );
+            } else if (itemKind == 'tv') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => TvDetailsPage(tvId: id)),
+              );
+            }
           }
-        }
-      },
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.grey.shade900,
-          border: Border.all(
-            color: const Color(0xFF53FC18).withOpacity(0.3),
-            width: 1,
-          ),
-        ),
+        },
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Poster image
-            if (imageUrl != null)
-              ClipRRect(
-                borderRadius: const BorderRadius.horizontal(
-                  left: Radius.circular(12),
-                ),
-                child: Image.network(
-                  imageUrl,
-                  width: 80,
-                  height: 120,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      width: 80,
-                      height: 120,
-                      color: Colors.grey.shade800,
-                      child: Icon(
-                        itemKind == 'movie' ? Icons.movie : Icons.tv,
-                        color: Colors.grey.shade600,
-                      ),
-                    );
-                  },
-                ),
-              )
-            else
-              Container(
-                width: 80,
-                height: 120,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade800,
-                  borderRadius: const BorderRadius.horizontal(
-                    left: Radius.circular(12),
+            SizedBox(
+              width: 100,
+              height: 150,
+              child: Hero(
+                tag: 'poster_${item['itemId']}',
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    bottomLeft: Radius.circular(16),
                   ),
-                ),
-                child: Icon(
-                  itemKind == 'movie' ? Icons.movie : Icons.tv,
-                  color: Colors.grey.shade600,
+                  child: imageUrl != null
+                      ? Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Container(
+                            color: Colors.grey.shade800,
+                            child: Icon(Icons.movie, color: Colors.grey.shade600),
+                          ),
+                        )
+                      : Container(
+                          color: Colors.grey.shade800,
+                          child: Icon(Icons.movie, color: Colors.grey.shade600),
+                        ),
                 ),
               ),
-
-            const SizedBox(width: 12),
-
-            // Info
+            ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Title
                     Text(
                       title,
                       style: const TextStyle(
@@ -266,76 +208,20 @@ class _CommonPlaylistPageState extends State<CommonPlaylistPage> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-
                     const SizedBox(height: 6),
-
-                    // Type and rating
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF53FC18).withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            itemKind.toUpperCase(),
-                            style: const TextStyle(
-                              color: Color(0xFF53FC18),
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Icon(
-                          Icons.star,
-                          color: Colors.yellow.shade600,
-                          size: 14,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          rating.toStringAsFixed(1),
-                          style: TextStyle(
-                            color: Colors.grey.shade300,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    // Overview
                     Text(
-                      overview.length > 100
-                          ? '${overview.substring(0, 100)}...'
-                          : overview,
-                      style: TextStyle(
-                        color: Colors.grey.shade400,
-                        fontSize: 12,
-                      ),
-                      maxLines: 2,
+                      overview,
+                      style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
+                      maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
             ),
-
-            const SizedBox(width: 12),
-
-            // Arrow
             Padding(
-              padding: const EdgeInsets.only(right: 12),
-              child: Icon(
-                Icons.arrow_forward_ios,
-                color: Colors.grey.shade600,
-                size: 16,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Icon(Icons.arrow_forward_ios, color: Colors.grey.shade600, size: 16),
             ),
           ],
         ),

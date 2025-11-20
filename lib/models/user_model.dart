@@ -4,6 +4,7 @@ class AppUser {
   final String lastName;
   final int age;
   final String photoUrl;
+  final bool isAdmin;
   final bool disabled;
   final List<String> favorites; // list of movie ids
 
@@ -13,6 +14,7 @@ class AppUser {
     required this.lastName,
     required this.age,
     required this.photoUrl,
+    this.isAdmin = false,
     this.disabled = false,
     this.favorites = const [],
   });
@@ -24,6 +26,7 @@ class AppUser {
       lastName: map['lastName'] ?? '',
       age: map['age'] ?? 0,
       photoUrl: map['photoUrl'] ?? '',
+      isAdmin: map['isAdmin'] ?? false,
       disabled: map['disabled'] ?? false,
       favorites: List<String>.from(map['favorites'] ?? []),
     );
@@ -35,6 +38,7 @@ class AppUser {
       'lastName': lastName,
       'age': age,
       'photoUrl': photoUrl,
+      'isAdmin': isAdmin,
       'disabled': disabled,
       'favorites': favorites,
     };

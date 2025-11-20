@@ -136,29 +136,51 @@ class MatchingService {
 
   /// Récupère les détails TMDB d'un item (movie ou tv) à partir de son ID formaté
   /// Format attendu: "movie_550" ou "tv_1256"
-  static Future<Map<String, dynamic>> getItemDetailsFromTMDB(String itemId) async {
-    try {
-      final parts = itemId.split('_');
-      if (parts.length != 2) {
-        print('Invalid item ID format: $itemId');
-        return {};
-      }
-
-      final kind = parts[0]; // "movie" ou "tv"
-      final id = parts[1];
-
-      if (kind == 'movie') {
-        return await MovieService.details(int.parse(id));
-      } else if (kind == 'tv') {
-        return await TvService.details(int.parse(id));
-      }
-
-      return {};
-    } catch (e) {
-      print('Error getting item details from TMDB: $e');
+static Future<Map<String, dynamic>> getItemDetailsFromTMDB(String itemId) async {
+  try {
+    if (!itemId.contains("_")) {
+      print("❌ Invalid format: $itemId");
       return {};
     }
+
+    final parts = itemId.split("_");
+    final kind = parts[0]; // movie / tv
+    final idString = parts[1]; // 1248226
+
+    // Vérifier l’ID
+    final id = int.tryParse(idString);
+    if (id == null) {
+      print("❌ ID is not an integer: $idString");
+      return {};
+    }
+
+    dynamic response;
+
+    if (kind == "movie") {
+      response = await MovieService.details(id);
+    } else if (kind == "tv") {
+      response = await TvService.details(id);
+    } else {
+      print("❌ Unknown kind: $kind");
+      return {};
+    }
+
+    // Convertir automatiquement List → Map
+    if (response is List && response.isNotEmpty) {
+      return Map<String, dynamic>.from(response.first);
+    }
+
+    if (response is Map<String, dynamic>) {
+      return response;
+    }
+
+    print("❌ Unexpected format: ${response.runtimeType}");
+    return {};
+  } catch (e) {
+    print("🔥 ERROR in getItemDetailsFromTMDB: $e");
+    return {};
   }
+}
 
   /// Récupère tous les détails TMDB pour une liste d'items communs
   static Future<List<Map<String, dynamic>>> getCommonItemsDetails(

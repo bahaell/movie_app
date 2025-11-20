@@ -1,0 +1,43 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.13.0'
+        channel: 'stable'
+
+    - name: Get dependencies
+      run: flutter pub get
+
+    - name: Run analysis
+      run: flutter analyze
+
+    - name: Run tests
+      run: flutter test
+
+    - name: Build APK
+      run: flutter build apk --release
+
+    - name: Build iOS
+      run: flutter build ios --release --no-codesign
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifacts
+        path: |
+          build/app/outputs/flutter-apk/
+          build/ios/

@@ -35,12 +35,22 @@ class _LoginPageState extends State<LoginPage> {
           .doc(cred.user!.uid)
           .get();
 
-      final data = snap.data()!;
+      final data = snap.data();
+
+      if (data == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("User data not found!")),
+          );
+        }
+        await FirebaseAuth.instance.signOut();
+        return;
+      }
 
       if (data["disabled"] == true) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Account disabled by admin")),
+            const SnackBar(content: Text("Your account has been disabled by an administrator.")),
           );
         }
         await FirebaseAuth.instance.signOut();
@@ -51,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
         if (data["isAdmin"] == true) {
           Navigator.pushReplacementNamed(context, "/admin");
         } else {
-          Navigator.pushReplacementNamed(context, "/user");
+          Navigator.pushReplacementNamed(context, "/user_connected");
         }
       }
     } catch (e) {
