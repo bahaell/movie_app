@@ -32,12 +32,14 @@ class FirestoreService {
   }
 
   Stream<List<MovieModel>> streamMovies() {
-    return moviesRef.snapshots().map((snap) =>
-        snap.docs.map((d) => MovieModel.fromMap(d.data() as Map<String, dynamic>)).toList());
+    return moviesRef.snapshots().map((snap) => snap.docs
+        .map((d) => MovieModel.fromMap(d.data() as Map<String, dynamic>))
+        .toList());
   }
 
   Stream<List<AppUser>> streamAllUsers() {
-    return usersRef.snapshots().map((snap) =>
-        snap.docs.map((d) => AppUser.fromMap(d.data() as Map<String, dynamic>, d.id)).toList());
+    return usersRef.snapshots().map((snap) => snap.docs
+        .map((d) => AppUser.fromMap(d.data() as Map<String, dynamic>, d.id))
+        .toList());
   }
 }

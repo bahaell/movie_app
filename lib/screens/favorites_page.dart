@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../services/movie_service.dart';
-import '../../services/tv_service.dart';
 import '../../widgets/movie_card.dart';
 
 class FavoritesPage extends StatefulWidget {
@@ -30,10 +29,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) return;
 
-      final userDoc = await FirebaseFirestore.instance
-          .collection("users")
-          .doc(uid)
-          .get();
+      final userDoc =
+          await FirebaseFirestore.instance.collection("users").doc(uid).get();
 
       final favorites = userDoc.data()?['favorites'] as List<dynamic>? ?? [];
       // Preload TMDB details for each favorite (movie_123, tv_456 or raw integer)
@@ -43,22 +40,17 @@ class _FavoritesPageState extends State<FavoritesPage> {
         final parsedId = _extractNumericId(fav);
         if (parsedId != null) {
           Map<String, dynamic> details = {};
-            final isTv = _isTvTag(fav);
-            try {
-              if (isTv) {
-                details = await TvService.details(parsedId);
-                if (details.isEmpty) details = {'id': parsedId, 'name': 'TV #$parsedId'};
-              } else {
-                details = await MovieService.details(parsedId);
-                if (details.isEmpty) details = {'id': parsedId, 'title': 'Movie #$parsedId'};
-              }
-            } catch (_) {
-              details = {'id': parsedId};
-            }
-            details['__kind'] = isTv ? 'tv' : 'movie';
-            _movieCache[fav] = details;
+          try {
+            details = await MovieService.details(parsedId);
+            if (details.isEmpty)
+              details = {'id': parsedId, 'title': 'Movie #$parsedId'};
+          } catch (_) {
+            details = {'id': parsedId};
+          }
+          details['__kind'] = 'movie';
+          _movieCache[fav] = details;
         } else {
-          _movieCache[fav] = {'raw': fav, '__kind': _isTvTag(fav) ? 'tv' : 'movie'};
+          _movieCache[fav] = {'raw': fav, '__kind': 'movie'};
         }
       }
       if (mounted) setState(() => _isLoading = false);
@@ -67,9 +59,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
       if (mounted) setState(() => _isLoading = false);
     }
   }
-
-  bool _isTvTag(dynamic raw) => raw is String && raw.startsWith('tv_');
-  bool _isMovieTag(dynamic raw) => raw is String && raw.startsWith('movie_');
 
   int? _extractNumericId(dynamic raw) {
     if (raw is int) return raw;
@@ -87,10 +76,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) return;
 
-      await FirebaseFirestore.instance
-          .collection("users")
-          .doc(uid)
-          .update({
+      await FirebaseFirestore.instance.collection("users").doc(uid).update({
         "favorites": FieldValue.arrayRemove([movieId])
       });
 
@@ -117,7 +103,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
         backgroundColor: Colors.black,
         title: const Text(
           "My Favorites",
-          style: TextStyle(color: Color(0xFF53fc18), fontWeight: FontWeight.bold),
+          style:
+              TextStyle(color: Color(0xFF53fc18), fontWeight: FontWeight.bold),
         ),
       ),
       body: _isLoading
@@ -179,7 +166,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
                 }
 
                 final favorites = docData as Map<String, dynamic>;
-                final favoriteList = (favorites["favorites"] as List<dynamic>?) ?? [];
+                final favoriteList =
+                    (favorites["favorites"] as List<dynamic>?) ?? [];
 
                 if (favoriteList.isEmpty) {
                   return Center(
@@ -239,7 +227,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
                     } else if (rawFavorite is String) {
                       // try to extract digits from the string
                       final match = RegExp(r"(\d+)").firstMatch(rawFavorite);
-                      movieId = match != null ? int.tryParse(match.group(0)!) : null;
+                      movieId =
+                          match != null ? int.tryParse(match.group(0)!) : null;
                       displayLabel = rawFavorite;
                     } else {
                       displayLabel = rawFavorite.toString();
@@ -247,18 +236,12 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
                     // Attempt to get cached TMDB / TV details
                     final data = _movieCache[rawFavorite];
-                    final kind = (data is Map<String, dynamic>)
-                        ? (data['__kind'] as String? ?? (_isTvTag(rawFavorite) ? 'tv' : 'movie'))
-                        : (_isTvTag(rawFavorite) ? 'tv' : 'movie');
 
                     return GestureDetector(
                       onTap: () {
                         if (movieId != null) {
-                          if (kind == 'tv') {
-                            Navigator.pushNamed(context, '/tv', arguments: movieId);
-                          } else {
-                            Navigator.pushNamed(context, '/movie', arguments: movieId);
-                          }
+                          Navigator.pushNamed(context, '/movie',
+                              arguments: movieId);
                         }
                       },
                       child: Container(
@@ -283,16 +266,21 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                 child: Center(
                                   child: data == null
                                       ? const CircularProgressIndicator(
-                                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF53fc18)),
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Color(0xFF53fc18)),
                                         )
-                                      : _buildPosterOrLabel(data as Map<String, dynamic>, displayLabel),
+                                      : _buildPosterOrLabel(
+                                          data as Map<String, dynamic>,
+                                          displayLabel),
                                 ),
                               ),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Expanded(
                                     child: Text(
@@ -308,13 +296,15 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                   IconButton(
                                     // Pass the raw stored value so Firestore will
                                     // remove the exact element (string or int).
-                                    onPressed: () => _removeFromFavorites(rawFavorite),
+                                    onPressed: () =>
+                                        _removeFromFavorites(rawFavorite),
                                     icon: const Icon(
                                       Icons.delete,
                                       color: Color(0xFF53fc18),
                                       size: 20,
                                     ),
-                                    constraints: const BoxConstraints(maxWidth: 35),
+                                    constraints:
+                                        const BoxConstraints(maxWidth: 35),
                                     padding: EdgeInsets.zero,
                                   ),
                                 ],
@@ -331,9 +321,10 @@ class _FavoritesPageState extends State<FavoritesPage> {
     );
   }
 
-  Widget _buildPosterOrLabel(Map<String, dynamic> movieData, String fallbackLabel) {
+  Widget _buildPosterOrLabel(
+      Map<String, dynamic> movieData, String fallbackLabel) {
     final posterPath = movieData['poster_path'] as String?;
-    final title = movieData['title'] as String? ?? movieData['name'] as String? ?? fallbackLabel;
+    final title = movieData['title'] as String? ?? fallbackLabel;
     if (posterPath != null && posterPath.isNotEmpty) {
       return ClipRRect(
         borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),

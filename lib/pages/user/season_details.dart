@@ -23,7 +23,8 @@ class SeasonDetailsPage extends StatelessWidget {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Text(seasonData['name'] ?? 'Season $seasonNumber', style: const TextStyle(color: Color(0xFF53FC18))),
+        title: Text(seasonData['name'] ?? 'Season $seasonNumber',
+            style: const TextStyle(color: Color(0xFF53FC18))),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12),
@@ -33,16 +34,26 @@ class SeasonDetailsPage extends StatelessWidget {
             if (poster != null)
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.network('$baseImg$poster', height: 250, width: double.infinity, fit: BoxFit.cover),
+                child: Image.network('$baseImg$poster',
+                    height: 250, width: double.infinity, fit: BoxFit.cover),
               )
             else
               Container(height: 250, color: Colors.grey.shade800),
             const SizedBox(height: 12),
-            Text(seasonData['name'] ?? '', style: const TextStyle(color: Color(0xFF53FC18), fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(seasonData['name'] ?? '',
+                style: const TextStyle(
+                    color: Color(0xFF53FC18),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text(seasonData['overview'] ?? '', style: const TextStyle(color: Colors.white70)),
+            Text(seasonData['overview'] ?? '',
+                style: const TextStyle(color: Colors.white70)),
             const SizedBox(height: 12),
-            const Text('Episodes', style: TextStyle(color: Color(0xFF53FC18), fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('Episodes',
+                style: TextStyle(
+                    color: Color(0xFF53FC18),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             ...episodes.map((ep) {
               return Container(
@@ -57,7 +68,9 @@ class SeasonDetailsPage extends StatelessWidget {
                   children: [
                     Text(
                       'Ep. ${ep['episode_number']} - ${ep['name'] ?? 'Unknown'}',
-                      style: const TextStyle(color: Color(0xFF53FC18), fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          color: Color(0xFF53FC18),
+                          fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
                     Text(

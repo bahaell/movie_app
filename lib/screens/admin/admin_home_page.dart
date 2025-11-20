@@ -14,7 +14,11 @@ class AdminHomePage extends StatefulWidget {
 
 class _AdminHomePageState extends State<AdminHomePage> {
   int _index = 0;
-  final pages = [const AdminMoviesPage(), const AdminUsersPage(), const AdminProfilePage()];
+  final pages = [
+    const AdminMoviesPage(),
+    const AdminUsersPage(),
+    const AdminProfilePage()
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +26,8 @@ class _AdminHomePageState extends State<AdminHomePage> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Text('Admin Panel', style: TextStyle(color: Color(0xFF53FC18))),
+        title: const Text('Admin Panel',
+            style: TextStyle(color: Color(0xFF53FC18))),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout, color: Color(0xFF53FC18)),
@@ -42,7 +47,8 @@ class _AdminHomePageState extends State<AdminHomePage> {
         onTap: (i) => setState(() => _index = i),
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.movie), label: 'Films'),
-          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Utilisateurs'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.people), label: 'Utilisateurs'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
         ],
       ),

@@ -4,7 +4,11 @@ class Review {
   final String content;
   final String? url;
 
-  Review({required this.id, required this.author, required this.content, this.url});
+  Review(
+      {required this.id,
+      required this.author,
+      required this.content,
+      this.url});
 
   factory Review.fromMap(Map<String, dynamic> map) {
     return Review(

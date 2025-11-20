@@ -1,11 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../services/movie_service.dart';
-import '../services/tv_service.dart';
 import '../services/watchlist_service.dart';
 import '../widgets/section_title.dart';
 import '../pages/user/movie_details.dart';
-import '../pages/user/tv_details.dart';
 import '../pages/user/search_page.dart';
 
 const String baseImg = 'https://image.tmdb.org/t/p/w500';
@@ -21,9 +19,6 @@ class _HomeUserPageState extends State<HomeUserPage> {
   List<dynamic> nowPlaying = [];
   List<dynamic> popularMovies = [];
   List<dynamic> topRatedMovies = [];
-  List<dynamic> onAirTv = [];
-  List<dynamic> popularTv = [];
-  List<dynamic> topRatedTv = [];
   Set<String> favorites = {};
   bool _isLoading = true;
 
@@ -42,9 +37,6 @@ class _HomeUserPageState extends State<HomeUserPage> {
         _fetchNowPlaying(),
         _fetchPopularMovies(),
         _fetchTopRatedMovies(),
-        _fetchOnAirTv(),
-        _fetchPopularTv(),
-        _fetchTopRatedTv(),
         _loadFavorites(),
       ]);
     } catch (e) {
@@ -86,39 +78,6 @@ class _HomeUserPageState extends State<HomeUserPage> {
       }
     } catch (e) {
       print('Error fetching top rated movies: $e');
-    }
-  }
-
-  Future<void> _fetchOnAirTv() async {
-    try {
-      final data = await TvService.onAir();
-      if (mounted) {
-        setState(() => onAirTv = data);
-      }
-    } catch (e) {
-      print('Error fetching on air TV: $e');
-    }
-  }
-
-  Future<void> _fetchPopularTv() async {
-    try {
-      final data = await TvService.popular();
-      if (mounted) {
-        setState(() => popularTv = data);
-      }
-    } catch (e) {
-      print('Error fetching popular TV: $e');
-    }
-  }
-
-  Future<void> _fetchTopRatedTv() async {
-    try {
-      final data = await TvService.topRated();
-      if (mounted) {
-        setState(() => topRatedTv = data);
-      }
-    } catch (e) {
-      print('Error fetching top rated TV: $e');
     }
   }
 
@@ -176,7 +135,8 @@ class _HomeUserPageState extends State<HomeUserPage> {
         backgroundColor: Colors.black,
         title: const Text(
           'MovieApp',
-          style: TextStyle(color: Color(0xFF53FC18), fontWeight: FontWeight.bold),
+          style:
+              TextStyle(color: Color(0xFF53FC18), fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
         actions: [
@@ -205,12 +165,6 @@ class _HomeUserPageState extends State<HomeUserPage> {
                   _movieHorizontalList(popularMovies, 'movie'),
                   _buildSectionTitle('Top Rated Movies'),
                   _movieHorizontalList(topRatedMovies, 'movie'),
-                  _buildSectionTitle('On Air TV Shows'),
-                  _movieHorizontalList(onAirTv, 'tv'),
-                  _buildSectionTitle('Popular TV Shows'),
-                  _movieHorizontalList(popularTv, 'tv'),
-                  _buildSectionTitle('Top Rated TV Shows'),
-                  _movieHorizontalList(topRatedTv, 'tv'),
                   const SizedBox(height: 20),
                 ],
               ),
@@ -262,30 +216,19 @@ class _HomeUserPageState extends State<HomeUserPage> {
         itemBuilder: (context, index) {
           final item = data[index] as Map<String, dynamic>;
           final id = item['id'] as int;
-          final title = kind == 'movie' 
-              ? item['title'] ?? 'No title' 
-              : item['name'] ?? 'No title';
+          final title = item['title'] ?? 'No title';
           final poster = item['poster_path'];
           final favTag = '${kind}_$id';
           final isFav = favorites.contains(favTag);
 
           return GestureDetector(
             onTap: () {
-              if (kind == 'movie') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => MovieDetailsPage(movieId: id),
-                  ),
-                );
-              } else {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => TvDetailsPage(tvId: id),
-                  ),
-                );
-              }
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => MovieDetailsPage(movieId: id),
+                ),
+              );
             },
             child: Stack(
               children: [
@@ -315,7 +258,8 @@ class _HomeUserPageState extends State<HomeUserPage> {
                       const SizedBox(height: 6),
                       Text(
                         title,
-                        style: const TextStyle(color: Colors.white, fontSize: 13),
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 13),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),

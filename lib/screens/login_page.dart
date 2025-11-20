@@ -50,7 +50,9 @@ class _LoginPageState extends State<LoginPage> {
       if (data["disabled"] == true) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Your account has been disabled by an administrator.")),
+            const SnackBar(
+                content: Text(
+                    "Your account has been disabled by an administrator.")),
           );
         }
         await FirebaseAuth.instance.signOut();

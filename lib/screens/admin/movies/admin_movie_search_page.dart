@@ -20,8 +20,8 @@ class _AdminMovieSearchPageState extends State<AdminMovieSearchPage> {
 
   Future<void> searchMovies(String query) async {
     if (query.isEmpty) return;
-     if (apiKey == null) {
-       ScaffoldMessenger.of(context).showSnackBar(
+    if (apiKey == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("TMDB API Key not found!")),
       );
       return;
@@ -94,13 +94,11 @@ class _AdminMovieSearchPageState extends State<AdminMovieSearchPage> {
               ),
             ),
           ),
-
           if (loading)
             const Padding(
               padding: EdgeInsets.all(20),
               child: CircularProgressIndicator(color: Colors.greenAccent),
             ),
-
           Expanded(
             child: ListView.builder(
               itemCount: results.length,
@@ -121,8 +119,8 @@ class _AdminMovieSearchPageState extends State<AdminMovieSearchPage> {
                     style: const TextStyle(color: Colors.greenAccent),
                   ),
                   trailing: IconButton(
-                    icon: const Icon(Icons.add_circle,
-                        color: Colors.greenAccent),
+                    icon:
+                        const Icon(Icons.add_circle, color: Colors.greenAccent),
                     onPressed: () => addMovieToFirestore(movie),
                   ),
                 );

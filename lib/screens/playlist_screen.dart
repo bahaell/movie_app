@@ -34,7 +34,9 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (!snapshot.hasData || snapshot.data == null || snapshot.data!.favorites.isEmpty) {
+          if (!snapshot.hasData ||
+              snapshot.data == null ||
+              snapshot.data!.favorites.isEmpty) {
             return const Center(
               child: Text('You haven\'t added any movies yet'),
             );
@@ -51,7 +53,8 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                 trailing: IconButton(
                   icon: const Icon(Icons.delete),
                   onPressed: () {
-                    final updatedFavorites = [...user.favorites]..removeAt(index);
+                    final updatedFavorites = [...user.favorites]
+                      ..removeAt(index);
                     _firestoreService.updateFavorites(userId, updatedFavorites);
                   },
                 ),

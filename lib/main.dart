@@ -9,7 +9,6 @@ import 'screens/favorites_page.dart';
 import 'screens/admin/admin_home_page.dart';
 import 'pages/user/search_page.dart';
 import 'pages/user/movie_details.dart';
-import 'pages/user/tv_details.dart';
 import 'pages/user/home_user_connected.dart';
 import 'pages/user/matching_page.dart';
 import 'app_theme.dart';
@@ -57,7 +56,8 @@ void main() async {
     await Firebase.initializeApp(options: firebaseOptionsForWeb);
   } else if (kIsWeb && !hasFirebaseWebConfig) {
     // Skip Firebase init on web if config missing to allow UI to load.
-    debugPrint('Firebase web configuration missing; skipping initialization. Provide keys in .env to enable auth/storage.');
+    debugPrint(
+        'Firebase web configuration missing; skipping initialization. Provide keys in .env to enable auth/storage.');
   } else {
     await Firebase.initializeApp();
   }
@@ -86,10 +86,6 @@ class MyApp extends StatelessWidget {
         '/movie': (context) {
           final id = ModalRoute.of(context)!.settings.arguments as int;
           return MovieDetailsPage(movieId: id);
-        },
-        '/tv': (context) {
-          final id = ModalRoute.of(context)!.settings.arguments as int;
-          return TvDetailsPage(tvId: id);
         },
       },
     );

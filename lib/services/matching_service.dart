@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_match.dart';
 import 'movie_service.dart';
-import 'tv_service.dart';
 
 class MatchingService {
   static const double minSimilarityThreshold = 75.0;
 
   /// Calcule la similarité de Jaccard entre deux ensembles
   /// similarité = (intersection / union) * 100
-  static double _calculateJaccardSimilarity(Set<String> setA, Set<String> setB) {
+  static double _calculateJaccardSimilarity(
+      Set<String> setA, Set<String> setB) {
     if (setA.isEmpty && setB.isEmpty) return 100.0;
     if (setA.isEmpty || setB.isEmpty) return 0.0;
 
@@ -30,7 +30,8 @@ class MatchingService {
       final db = FirebaseFirestore.instance;
 
       // 1) Récupérer la watchlist de l'utilisateur courant
-      final currentUserDoc = await db.collection('users').doc(currentUserId).get();
+      final currentUserDoc =
+          await db.collection('users').doc(currentUserId).get();
       if (!currentUserDoc.exists) {
         print('Current user document not found: $currentUserId');
         return [];
@@ -68,10 +69,13 @@ class MatchingService {
         if (otherWatchlist.isEmpty) continue;
 
         // Calculer la similarité Jaccard
-        final similarity = _calculateJaccardSimilarity(currentWatchlist, otherWatchlist);
-        final intersection = currentWatchlist.intersection(otherWatchlist).length;
+        final similarity =
+            _calculateJaccardSimilarity(currentWatchlist, otherWatchlist);
+        final intersection =
+            currentWatchlist.intersection(otherWatchlist).length;
 
-        print('User $uid similarity: ${similarity.toStringAsFixed(1)}% (common: $intersection)');
+        print(
+            'User $uid similarity: ${similarity.toStringAsFixed(1)}% (common: $intersection)');
 
         // Ajouter si similarité >= threshold
         if (similarity >= threshold) {
@@ -136,51 +140,50 @@ class MatchingService {
 
   /// Récupère les détails TMDB d'un item (movie ou tv) à partir de son ID formaté
   /// Format attendu: "movie_550" ou "tv_1256"
-static Future<Map<String, dynamic>> getItemDetailsFromTMDB(String itemId) async {
-  try {
-    if (!itemId.contains("_")) {
-      print("❌ Invalid format: $itemId");
+  static Future<Map<String, dynamic>> getItemDetailsFromTMDB(
+      String itemId) async {
+    try {
+      if (!itemId.contains("_")) {
+        print("❌ Invalid format: $itemId");
+        return {};
+      }
+
+      final parts = itemId.split("_");
+      final kind = parts[0]; // movie
+      final idString = parts[1]; // 1248226
+
+      // Vérifier l’ID
+      final id = int.tryParse(idString);
+      if (id == null) {
+        print("❌ ID is not an integer: $idString");
+        return {};
+      }
+
+      dynamic response;
+
+      if (kind == "movie") {
+        response = await MovieService.details(id);
+      } else {
+        print("❌ Unknown kind: $kind");
+        return {};
+      }
+
+      // Convertir automatiquement List → Map
+      if (response is List && response.isNotEmpty) {
+        return Map<String, dynamic>.from(response.first);
+      }
+
+      if (response is Map<String, dynamic>) {
+        return response;
+      }
+
+      print("❌ Unexpected format: ${response.runtimeType}");
+      return {};
+    } catch (e) {
+      print("🔥 ERROR in getItemDetailsFromTMDB: $e");
       return {};
     }
-
-    final parts = itemId.split("_");
-    final kind = parts[0]; // movie / tv
-    final idString = parts[1]; // 1248226
-
-    // Vérifier l’ID
-    final id = int.tryParse(idString);
-    if (id == null) {
-      print("❌ ID is not an integer: $idString");
-      return {};
-    }
-
-    dynamic response;
-
-    if (kind == "movie") {
-      response = await MovieService.details(id);
-    } else if (kind == "tv") {
-      response = await TvService.details(id);
-    } else {
-      print("❌ Unknown kind: $kind");
-      return {};
-    }
-
-    // Convertir automatiquement List → Map
-    if (response is List && response.isNotEmpty) {
-      return Map<String, dynamic>.from(response.first);
-    }
-
-    if (response is Map<String, dynamic>) {
-      return response;
-    }
-
-    print("❌ Unexpected format: ${response.runtimeType}");
-    return {};
-  } catch (e) {
-    print("🔥 ERROR in getItemDetailsFromTMDB: $e");
-    return {};
   }
-}
 
   /// Récupère tous les détails TMDB pour une liste d'items communs
   static Future<List<Map<String, dynamic>>> getCommonItemsDetails(

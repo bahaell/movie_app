@@ -19,7 +19,8 @@ class _UserHomePageState extends State<UserHomePage> {
         backgroundColor: Colors.black,
         title: const Text(
           'MovieApp',
-          style: TextStyle(color: Color(0xFF53FC18), fontWeight: FontWeight.bold),
+          style:
+              TextStyle(color: Color(0xFF53FC18), fontWeight: FontWeight.bold),
         ),
       ),
       body: SingleChildScrollView(
@@ -28,22 +29,16 @@ class _UserHomePageState extends State<UserHomePage> {
           children: [
             buildSectionTitle('Now Playing'),
             movieHorizontalList(),
-
             buildSectionTitle('Popular Movies'),
             movieHorizontalList(),
-
             buildSectionTitle('Top Rated Movies'),
             movieHorizontalList(),
-
             buildSectionTitle('On Air TV Shows'),
             movieHorizontalList(),
-
             buildSectionTitle('Popular TV Shows'),
             movieHorizontalList(),
-
             buildSectionTitle('Top Rated TV Shows'),
             movieHorizontalList(),
-
             const SizedBox(height: 20),
           ],
         ),
@@ -177,7 +172,8 @@ class MovieDetailsPage extends StatelessWidget {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Text('Details', style: TextStyle(color: Color(0xFF53FC18))),
+        title:
+            const Text('Details', style: TextStyle(color: Color(0xFF53FC18))),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12),
@@ -194,7 +190,10 @@ class MovieDetailsPage extends StatelessWidget {
             const SizedBox(height: 15),
             const Text(
               'Movie Title',
-              style: TextStyle(color: Color(0xFF53FC18), fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  color: Color(0xFF53FC18),
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             const Text(
@@ -204,7 +203,10 @@ class MovieDetailsPage extends StatelessWidget {
             const SizedBox(height: 15),
             const Text(
               'Cast',
-              style: TextStyle(color: Color(0xFF53FC18), fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  color: Color(0xFF53FC18),
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             SizedBox(

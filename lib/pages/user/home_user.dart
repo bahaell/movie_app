@@ -176,8 +176,8 @@ class _HomeUserPageState extends State<HomeUserPage> {
         itemBuilder: (context, index) {
           final item = items[index] as Map<String, dynamic>;
           final id = item['id'] as int;
-          final title = isMovie 
-              ? (item['title'] ?? 'Untitled') 
+          final title = isMovie
+              ? (item['title'] ?? 'Untitled')
               : (item['name'] ?? 'Untitled');
           final poster = item['poster_path'];
           final favTag = '${isMovie ? "movie" : "tv"}_$id';
@@ -229,7 +229,8 @@ class _HomeUserPageState extends State<HomeUserPage> {
                       const SizedBox(height: 6),
                       Text(
                         title,
-                        style: const TextStyle(color: Colors.white, fontSize: 13),
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 13),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -271,7 +272,8 @@ class _HomeUserPageState extends State<HomeUserPage> {
         backgroundColor: Colors.black,
         title: const Text(
           'Home',
-          style: TextStyle(color: Color(0xFF53FC18), fontWeight: FontWeight.bold),
+          style:
+              TextStyle(color: Color(0xFF53FC18), fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(

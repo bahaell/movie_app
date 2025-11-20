@@ -55,10 +55,12 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Text(details['title'] ?? 'Détails', style: const TextStyle(color: Color(0xFF53FC18))),
+        title: Text(details['title'] ?? 'Détails',
+            style: const TextStyle(color: Color(0xFF53FC18))),
       ),
       body: loading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFF53FC18)))
+          ? const Center(
+              child: CircularProgressIndicator(color: Color(0xFF53FC18)))
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -73,39 +75,61 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                           tag: favTag,
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8),
-                            child: Image.network('$baseImg${details['poster_path']}', width: 120, height: 180, fit: BoxFit.cover),
+                            child: Image.network(
+                                '$baseImg${details['poster_path']}',
+                                width: 120,
+                                height: 180,
+                                fit: BoxFit.cover),
                           ),
                         )
                       else
-                        Container(width: 120, height: 180, color: Colors.grey.shade800),
+                        Container(
+                            width: 120,
+                            height: 180,
+                            color: Colors.grey.shade800),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(details['title'] ?? '', style: const TextStyle(color: Color(0xFF53FC18), fontSize: 18, fontWeight: FontWeight.bold)),
+                            Text(details['title'] ?? '',
+                                style: const TextStyle(
+                                    color: Color(0xFF53FC18),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold)),
                             const SizedBox(height: 8),
-                            Text('⭐ ${details['vote_average'] ?? '-'}', style: const TextStyle(color: Colors.white)),
+                            Text('⭐ ${details['vote_average'] ?? '-'}',
+                                style: const TextStyle(color: Colors.white)),
                             const SizedBox(height: 8),
-                            Text('⏱ ${details['runtime'] ?? '-'} min', style: const TextStyle(color: Colors.white)),
+                            Text('⏱ ${details['runtime'] ?? '-'} min',
+                                style: const TextStyle(color: Colors.white)),
                             const SizedBox(height: 12),
                             ElevatedButton(
                               onPressed: () async {
                                 try {
-                                  final uid = FirebaseAuth.instance.currentUser!.uid;
+                                  final uid =
+                                      FirebaseAuth.instance.currentUser!.uid;
                                   if (!isFav) {
-                                    await WatchlistService.addToWatchlist(widget.movieId, 'movie');
+                                    await WatchlistService.addToWatchlist(
+                                        widget.movieId, 'movie');
                                   } else {
-                                    await WatchlistService.removeFromWatchlist(widget.movieId, 'movie');
+                                    await WatchlistService.removeFromWatchlist(
+                                        widget.movieId, 'movie');
                                   }
-                                  final wl = await WatchlistService.getWatchlistOnce(uid);
+                                  final wl =
+                                      await WatchlistService.getWatchlistOnce(
+                                          uid);
                                   setState(() => isFav = wl.contains(favTag));
                                 } catch (e) {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Error: $e')));
                                 }
                               },
-                              style: ElevatedButton.styleFrom(backgroundColor: Color(isFav ? 0xFF53FC18 : 0xFF888888)),
-                              child: Text(isFav ? 'Remove' : 'Add to Watchlist', style: TextStyle(color: Colors.black)),
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Color(isFav ? 0xFF53FC18 : 0xFF888888)),
+                              child: Text(isFav ? 'Remove' : 'Add to Watchlist',
+                                  style: TextStyle(color: Colors.black)),
                             )
                           ],
                         ),
@@ -113,12 +137,21 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const Text('Overview', style: TextStyle(color: Color(0xFF53FC18), fontSize: 16, fontWeight: FontWeight.bold)),
+                  const Text('Overview',
+                      style: TextStyle(
+                          color: Color(0xFF53FC18),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
-                  Text(details['overview'] ?? '', style: const TextStyle(color: Colors.white70)),
+                  Text(details['overview'] ?? '',
+                      style: const TextStyle(color: Colors.white70)),
                   const SizedBox(height: 16),
                   if (cast.isNotEmpty) ...[
-                    const Text('Cast', style: TextStyle(color: Color(0xFF53FC18), fontSize: 16, fontWeight: FontWeight.bold)),
+                    const Text('Cast',
+                        style: TextStyle(
+                            color: Color(0xFF53FC18),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     SizedBox(
                       height: 120,
@@ -137,11 +170,21 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
                                   child: profile != null
-                                      ? Image.network('$baseImg$profile', height: 80, width: 90, fit: BoxFit.cover)
-                                      : Container(height: 80, width: 90, color: Colors.grey.shade800),
+                                      ? Image.network('$baseImg$profile',
+                                          height: 80,
+                                          width: 90,
+                                          fit: BoxFit.cover)
+                                      : Container(
+                                          height: 80,
+                                          width: 90,
+                                          color: Colors.grey.shade800),
                                 ),
                                 const SizedBox(height: 6),
-                                Text(name, style: const TextStyle(color: Colors.white70, fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                Text(name,
+                                    style: const TextStyle(
+                                        color: Colors.white70, fontSize: 12),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis),
                               ],
                             ),
                           );
@@ -151,24 +194,42 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                     const SizedBox(height: 16),
                   ],
                   if (reviews.isNotEmpty) ...[
-                    const Text('Reviews', style: TextStyle(color: Color(0xFF53FC18), fontSize: 16, fontWeight: FontWeight.bold)),
+                    const Text('Reviews',
+                        style: TextStyle(
+                            color: Color(0xFF53FC18),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     ...reviews.take(3).map((r) => Padding(
                           padding: const EdgeInsets.only(bottom: 12),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(r['author'] ?? 'Anonymous', style: const TextStyle(color: Color(0xFF53FC18), fontWeight: FontWeight.bold)),
+                              Text(r['author'] ?? 'Anonymous',
+                                  style: const TextStyle(
+                                      color: Color(0xFF53FC18),
+                                      fontWeight: FontWeight.bold)),
                               const SizedBox(height: 4),
-                              Text((r['content'] ?? '').substring(0, ((r['content'] ?? '').length > 200 ? 200 : (r['content'] ?? '').length)) + '...',
-                                  style: const TextStyle(color: Colors.white70)),
+                              Text(
+                                  (r['content'] ?? '').substring(
+                                          0,
+                                          ((r['content'] ?? '').length > 200
+                                              ? 200
+                                              : (r['content'] ?? '').length)) +
+                                      '...',
+                                  style:
+                                      const TextStyle(color: Colors.white70)),
                             ],
                           ),
                         )),
                     const SizedBox(height: 16),
                   ],
                   if (similar.isNotEmpty) ...[
-                    const Text('Similar Movies', style: TextStyle(color: Color(0xFF53FC18), fontSize: 16, fontWeight: FontWeight.bold)),
+                    const Text('Similar Movies',
+                        style: TextStyle(
+                            color: Color(0xFF53FC18),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     SizedBox(
                       height: 200,
@@ -180,7 +241,11 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                           final title = s['title'] ?? '';
                           final poster = s['poster_path'];
                           return GestureDetector(
-                            onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => MovieDetailsPage(movieId: s['id']))),
+                            onTap: () => Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) =>
+                                        MovieDetailsPage(movieId: s['id']))),
                             child: Container(
                               width: 110,
                               margin: const EdgeInsets.only(right: 8),
@@ -189,11 +254,21 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(8),
                                     child: poster != null
-                                        ? Image.network('$baseImg$poster', height: 150, width: 110, fit: BoxFit.cover)
-                                        : Container(height: 150, width: 110, color: Colors.grey.shade800),
+                                        ? Image.network('$baseImg$poster',
+                                            height: 150,
+                                            width: 110,
+                                            fit: BoxFit.cover)
+                                        : Container(
+                                            height: 150,
+                                            width: 110,
+                                            color: Colors.grey.shade800),
                                   ),
                                   const SizedBox(height: 6),
-                                  Text(title, style: const TextStyle(color: Colors.white70, fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                  Text(title,
+                                      style: const TextStyle(
+                                          color: Colors.white70, fontSize: 12),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis),
                                 ],
                               ),
                             ),

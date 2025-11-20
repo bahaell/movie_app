@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/movie_service.dart';
-import '../../services/tv_service.dart';
 import 'movie_details.dart';
-import 'tv_details.dart';
 
 const String baseImg = 'https://image.tmdb.org/t/p/w500';
 
@@ -25,15 +23,9 @@ class _SearchPageState extends State<SearchPage> {
     }
     setState(() => loading = true);
     final movies = await MovieService.search(q);
-    final tvs = await TvService.search(q);
-    
-    // Combine results with type tag
-    final combined = <Map<String, dynamic>>[];
-    combined.addAll(movies.map((m) => {...(m as Map), 'kind': 'movie'}));
-    combined.addAll(tvs.map((t) => {...(t as Map), 'kind': 'tv'}));
-    
+
     setState(() {
-      results = combined;
+      results = movies;
       loading = false;
     });
   }
@@ -61,11 +53,13 @@ class _SearchPageState extends State<SearchPage> {
               onSubmitted: _onSearch,
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
-                hintText: 'Search movies or TV shows...',
+                hintText: 'Search movies...',
                 hintStyle: TextStyle(color: Colors.grey.shade600),
                 filled: true,
                 fillColor: Colors.grey.shade900,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.search, color: Color(0xFF53FC18)),
                   onPressed: () => _onSearch(_ctrl.text),
@@ -74,12 +68,16 @@ class _SearchPageState extends State<SearchPage> {
             ),
           ),
           if (loading)
-            const Expanded(child: Center(child: CircularProgressIndicator(color: Color(0xFF53FC18))))
+            const Expanded(
+                child: Center(
+                    child: CircularProgressIndicator(color: Color(0xFF53FC18))))
           else if (results.isEmpty)
             Expanded(
               child: Center(
                 child: Text(
-                  _ctrl.text.isEmpty ? 'Enter a search term' : 'No results found',
+                  _ctrl.text.isEmpty
+                      ? 'Enter a search term'
+                      : 'No results found',
                   style: const TextStyle(color: Colors.white70),
                 ),
               ),
@@ -91,18 +89,17 @@ class _SearchPageState extends State<SearchPage> {
                 itemCount: results.length,
                 itemBuilder: (context, i) {
                   final it = results[i] as Map<String, dynamic>;
-                  final kind = it['kind'] as String;
-                  final title = kind == 'movie' ? it['title'] ?? '' : it['name'] ?? '';
+                  final title = it['title'] ?? '';
                   final poster = it['poster_path'];
                   final img = poster != null ? '$baseImg$poster' : null;
-                  
+
                   return GestureDetector(
                     onTap: () {
-                      if (kind == 'movie') {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => MovieDetailsPage(movieId: it['id'])));
-                      } else {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => TvDetailsPage(tvId: it['id'])));
-                      }
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) =>
+                                  MovieDetailsPage(movieId: it['id'])));
                     },
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 8),
@@ -116,10 +113,14 @@ class _SearchPageState extends State<SearchPage> {
                           if (img != null)
                             ClipRRect(
                               borderRadius: BorderRadius.circular(6),
-                              child: Image.network(img, width: 60, height: 90, fit: BoxFit.cover),
+                              child: Image.network(img,
+                                  width: 60, height: 90, fit: BoxFit.cover),
                             )
                           else
-                            Container(width: 60, height: 90, color: Colors.grey.shade800),
+                            Container(
+                                width: 60,
+                                height: 90,
+                                color: Colors.grey.shade800),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(
@@ -127,19 +128,17 @@ class _SearchPageState extends State<SearchPage> {
                               children: [
                                 Text(
                                   title,
-                                  style: const TextStyle(color: Color(0xFF53FC18), fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                      color: Color(0xFF53FC18),
+                                      fontWeight: FontWeight.bold),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  kind.toUpperCase(),
-                                  style: const TextStyle(color: Colors.white54, fontSize: 12),
                                 ),
                               ],
                             ),
                           ),
-                          const Icon(Icons.arrow_forward, color: Color(0xFF53FC18)),
+                          const Icon(Icons.arrow_forward,
+                              color: Color(0xFF53FC18)),
                         ],
                       ),
                     ),

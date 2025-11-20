@@ -26,7 +26,9 @@ class Movie {
       overview: map['overview'],
       posterPath: map['poster_path'],
       backdropPath: map['backdrop_path'],
-      voteAverage: (map['vote_average'] is num) ? (map['vote_average'] as num).toDouble() : null,
+      voteAverage: (map['vote_average'] is num)
+          ? (map['vote_average'] as num).toDouble()
+          : null,
       runtime: map['runtime'],
       genreIds: (map['genre_ids'] as List<dynamic>?)?.cast<int>(),
     );

@@ -11,9 +11,11 @@ class AdminProfilePage extends StatelessWidget {
         children: const [
           CircleAvatar(radius: 40, backgroundColor: Colors.grey),
           SizedBox(height: 12),
-          Text('Admin', style: TextStyle(color: Color(0xFF53FC18), fontSize: 20)),
+          Text('Admin',
+              style: TextStyle(color: Color(0xFF53FC18), fontSize: 20)),
           SizedBox(height: 8),
-          Text('Gérer le contenu et les utilisateurs', style: TextStyle(color: Colors.white54)),
+          Text('Gérer le contenu et les utilisateurs',
+              style: TextStyle(color: Colors.white54)),
         ],
       ),
     );

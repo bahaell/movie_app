@@ -142,10 +142,12 @@ class _MatchingPageState extends State<MatchingPage> {
                     hintStyle: TextStyle(color: Colors.grey.shade600),
                     filled: true,
                     fillColor: Colors.grey.shade900,
-                    prefixIcon: const Icon(Icons.search, color: Color(0xFF53FC18)),
+                    prefixIcon:
+                        const Icon(Icons.search, color: Color(0xFF53FC18)),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear, color: Color(0xFF53FC18)),
+                            icon: const Icon(Icons.clear,
+                                color: Color(0xFF53FC18)),
                             onPressed: () {
                               _searchController.clear();
                               _filterMatches('');
@@ -199,7 +201,7 @@ class _MatchingPageState extends State<MatchingPage> {
 
   Widget _buildMatchCard(UserMatch match) {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
-    
+
     return GestureDetector(
       onTap: () {
         Navigator.push(

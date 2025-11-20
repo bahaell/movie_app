@@ -4,7 +4,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class MovieService {
   // Read TMDB API key from environment; fall back to the embedded key if not provided.
-  static String get apiKey => dotenv.env['TMDB_API_KEY'] ?? "00498c90aa03a7dbf2659cca75f6a735";
+  static String get apiKey =>
+      dotenv.env['TMDB_API_KEY'] ?? "00498c90aa03a7dbf2659cca75f6a735";
   static const baseUrl = "https://api.themoviedb.org/3";
   static const imageBaseUrl = "https://image.tmdb.org/t/p/w500";
 
@@ -62,7 +63,8 @@ class MovieService {
   // Compatibility helpers used across the app
   static Future<List<dynamic>> nowPlaying({int page = 1}) async {
     try {
-      final url = Uri.parse('$baseUrl/movie/now_playing?api_key=$apiKey&language=en-US&page=$page');
+      final url = Uri.parse(
+          '$baseUrl/movie/now_playing?api_key=$apiKey&language=en-US&page=$page');
       final res = await http.get(url);
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);
@@ -76,7 +78,8 @@ class MovieService {
 
   static Future<List<dynamic>> topRated({int page = 1}) async {
     try {
-      final url = Uri.parse('$baseUrl/movie/top_rated?api_key=$apiKey&language=en-US&page=$page');
+      final url = Uri.parse(
+          '$baseUrl/movie/top_rated?api_key=$apiKey&language=en-US&page=$page');
       final res = await http.get(url);
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);
@@ -90,9 +93,11 @@ class MovieService {
 
   static Future<Map<String, dynamic>> details(int id) async {
     try {
-      final url = Uri.parse('$baseUrl/movie/$id?api_key=$apiKey&language=en-US');
+      final url =
+          Uri.parse('$baseUrl/movie/$id?api_key=$apiKey&language=en-US');
       final res = await http.get(url);
-      if (res.statusCode == 200) return jsonDecode(res.body) as Map<String, dynamic>;
+      if (res.statusCode == 200)
+        return jsonDecode(res.body) as Map<String, dynamic>;
     } catch (e) {
       print('Error fetching movie details: $e');
     }
@@ -101,7 +106,8 @@ class MovieService {
 
   static Future<List<dynamic>> cast(int id) async {
     try {
-      final url = Uri.parse('$baseUrl/movie/$id/credits?api_key=$apiKey&language=en-US');
+      final url = Uri.parse(
+          '$baseUrl/movie/$id/credits?api_key=$apiKey&language=en-US');
       final res = await http.get(url);
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);
@@ -115,7 +121,8 @@ class MovieService {
 
   static Future<List<dynamic>> reviews(int id) async {
     try {
-      final url = Uri.parse('$baseUrl/movie/$id/reviews?api_key=$apiKey&language=en-US');
+      final url = Uri.parse(
+          '$baseUrl/movie/$id/reviews?api_key=$apiKey&language=en-US');
       final res = await http.get(url);
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);
@@ -129,7 +136,8 @@ class MovieService {
 
   static Future<List<dynamic>> similar(int id) async {
     try {
-      final url = Uri.parse('$baseUrl/movie/$id/similar?api_key=$apiKey&language=en-US');
+      final url = Uri.parse(
+          '$baseUrl/movie/$id/similar?api_key=$apiKey&language=en-US');
       final res = await http.get(url);
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);

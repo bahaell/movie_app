@@ -57,7 +57,7 @@ class _MovieCardState extends State<MovieCard> {
                   height: 200,
                   width: 160,
                   color: Colors.grey[800],
-                  child: const Icon(Icons.image_not_supported, 
+                  child: const Icon(Icons.image_not_supported,
                       color: Color(0xFF53fc18)),
                 );
               },

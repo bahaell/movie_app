@@ -41,7 +41,10 @@ class WatchlistToggle extends StatelessWidget {
     }
 
     return StreamBuilder<DocumentSnapshot>(
-      stream: FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .snapshots(),
       builder: (context, snap) {
         final favorites = <String>[];
         if (snap.hasData && snap.data?.data() != null) {
@@ -57,11 +60,17 @@ class WatchlistToggle extends StatelessWidget {
                 if (!isFav) {
                   await WatchlistService.addToWatchlist(id, kind);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('${kind.toUpperCase()} added to watchlist')),);
+                    SnackBar(
+                        content:
+                            Text('${kind.toUpperCase()} added to watchlist')),
+                  );
                 } else {
                   await WatchlistService.removeFromWatchlist(id, kind);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('${kind.toUpperCase()} removed from watchlist')),);
+                    SnackBar(
+                        content: Text(
+                            '${kind.toUpperCase()} removed from watchlist')),
+                  );
                 }
                 onChanged?.call();
               } catch (e) {

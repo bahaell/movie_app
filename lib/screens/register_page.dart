@@ -48,10 +48,10 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Future<void> _register() async {
-    if (_first.text.isEmpty || 
-        _last.text.isEmpty || 
-        _age.text.isEmpty || 
-        _email.text.isEmpty || 
+    if (_first.text.isEmpty ||
+        _last.text.isEmpty ||
+        _age.text.isEmpty ||
+        _email.text.isEmpty ||
         _pass.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill all fields')),
@@ -72,7 +72,10 @@ class _RegisterPageState extends State<RegisterPage> {
         photoUrl = await _uploadImage(cred.user!.uid);
       }
 
-      await FirebaseFirestore.instance.collection("users").doc(cred.user!.uid).set({
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(cred.user!.uid)
+          .set({
         "firstName": _first.text.trim(),
         "lastName": _last.text.trim(),
         "age": int.parse(_age.text.trim()),
@@ -129,9 +132,10 @@ class _RegisterPageState extends State<RegisterPage> {
                   onTap: _pickImage,
                   child: CircleAvatar(
                     radius: 45,
-                    backgroundImage: _image != null ? MemoryImage(_image!) : null,
+                    backgroundImage:
+                        _image != null ? MemoryImage(_image!) : null,
                     backgroundColor: Colors.grey.shade800,
-                    child: _image == null 
+                    child: _image == null
                         ? const Icon(Icons.camera_alt, color: Color(0xFF53fc18))
                         : null,
                   ),
@@ -139,7 +143,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 20),
                 _buildTextField(_first, "First Name"),
                 _buildTextField(_last, "Last Name"),
-                _buildTextField(_age, "Age", keyboardType: TextInputType.number),
+                _buildTextField(_age, "Age",
+                    keyboardType: TextInputType.number),
                 _buildTextField(_email, "Email"),
                 _buildTextField(_pass, "Password", obscure: true),
                 const SizedBox(height: 20),

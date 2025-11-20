@@ -33,9 +33,10 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               const Text("Login",
                   style: TextStyle(
-                      fontSize: 28, color: Color(0xFF53FC18), fontWeight: FontWeight.bold)),
+                      fontSize: 28,
+                      color: Color(0xFF53FC18),
+                      fontWeight: FontWeight.bold)),
               const SizedBox(height: 20),
-
               TextField(
                 controller: emailCtrl,
                 decoration: const InputDecoration(hintText: "Email"),
@@ -46,7 +47,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 decoration: const InputDecoration(hintText: "Password"),
               ),
               const SizedBox(height: 20),
-
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF53FC18),
@@ -58,8 +58,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         setState(() => loading = true);
 
                         try {
-                          final auth = Provider.of<AuthService>(context, listen: false);
-                          final user = await auth.login(emailCtrl.text.trim(), passCtrl.text.trim());
+                          final auth =
+                              Provider.of<AuthService>(context, listen: false);
+                          final user = await auth.login(
+                              emailCtrl.text.trim(), passCtrl.text.trim());
 
                           if (user == null) return;
 
@@ -87,7 +89,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ? const CircularProgressIndicator(color: Colors.black)
                     : const Text("Login"),
               ),
-
               const SizedBox(height: 10),
               TextButton(
                 onPressed: () => Navigator.pushNamed(context, "/register"),

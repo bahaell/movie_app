@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/matching_service.dart';
 import 'movie_details.dart';
-import 'tv_details.dart';
 
 const String baseImg = 'https://image.tmdb.org/t/p/w500';
 
@@ -40,7 +39,8 @@ class _CommonPlaylistPageState extends State<CommonPlaylistPage> {
     );
 
     // Fetch all details in parallel for better performance
-    final detailFutures = commonIds.map((id) => MatchingService.getItemDetailsFromTMDB(id));
+    final detailFutures =
+        commonIds.map((id) => MatchingService.getItemDetailsFromTMDB(id));
     final results = await Future.wait(detailFutures);
 
     // Filter out any empty results and add item metadata
@@ -50,7 +50,7 @@ class _CommonPlaylistPageState extends State<CommonPlaylistPage> {
       validResults[i]['itemId'] = itemId;
       validResults[i]['itemKind'] = itemId.split('_').first;
     }
-    
+
     return validResults;
   }
 
@@ -107,7 +107,8 @@ class _CommonPlaylistPageState extends State<CommonPlaylistPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.not_interested, color: Colors.grey.shade600, size: 60),
+                  Icon(Icons.not_interested,
+                      color: Colors.grey.shade600, size: 60),
                   const SizedBox(height: 16),
                   Text(
                     'No common favorites found.',
@@ -150,17 +151,10 @@ class _CommonPlaylistPageState extends State<CommonPlaylistPage> {
       child: InkWell(
         onTap: () {
           if (id != null) {
-            if (itemKind == 'movie') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => MovieDetailsPage(movieId: id)),
-              );
-            } else if (itemKind == 'tv') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => TvDetailsPage(tvId: id)),
-              );
-            }
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => MovieDetailsPage(movieId: id)),
+            );
           }
         },
         child: Row(
@@ -182,7 +176,8 @@ class _CommonPlaylistPageState extends State<CommonPlaylistPage> {
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => Container(
                             color: Colors.grey.shade800,
-                            child: Icon(Icons.movie, color: Colors.grey.shade600),
+                            child:
+                                Icon(Icons.movie, color: Colors.grey.shade600),
                           ),
                         )
                       : Container(
@@ -211,7 +206,8 @@ class _CommonPlaylistPageState extends State<CommonPlaylistPage> {
                     const SizedBox(height: 6),
                     Text(
                       overview,
-                      style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
+                      style:
+                          TextStyle(color: Colors.grey.shade400, fontSize: 13),
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -221,7 +217,8 @@ class _CommonPlaylistPageState extends State<CommonPlaylistPage> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Icon(Icons.arrow_forward_ios, color: Colors.grey.shade600, size: 16),
+              child: Icon(Icons.arrow_forward_ios,
+                  color: Colors.grey.shade600, size: 16),
             ),
           ],
         ),

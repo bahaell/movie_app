@@ -4,7 +4,11 @@ class MovieModel {
   final String posterPath;
   final String overview;
 
-  MovieModel({required this.id, required this.title, required this.posterPath, required this.overview});
+  MovieModel(
+      {required this.id,
+      required this.title,
+      required this.posterPath,
+      required this.overview});
 
   factory MovieModel.fromMap(Map<String, dynamic> map) {
     return MovieModel(

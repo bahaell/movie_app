@@ -31,7 +31,8 @@ class _MatchScreenState extends State<MatchScreen> {
       body: FutureBuilder<AppUser?>(
         future: _firestoreService.getUser(userId),
         builder: (context, currentUserSnapshot) {
-          if (!currentUserSnapshot.hasData || currentUserSnapshot.data == null) {
+          if (!currentUserSnapshot.hasData ||
+              currentUserSnapshot.data == null) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -52,7 +53,8 @@ class _MatchScreenState extends State<MatchScreen> {
 
               if (matches.isEmpty) {
                 return const Center(
-                  child: Text('No matches found. Keep adding movies to your favorites!'),
+                  child: Text(
+                      'No matches found. Keep adding movies to your favorites!'),
                 );
               }
 
@@ -65,12 +67,14 @@ class _MatchScreenState extends State<MatchScreen> {
                     child: ListTile(
                       leading: match.user.photoUrl.isNotEmpty
                           ? CircleAvatar(
-                              backgroundImage: NetworkImage(match.user.photoUrl),
+                              backgroundImage:
+                                  NetworkImage(match.user.photoUrl),
                             )
                           : const CircleAvatar(
                               child: Icon(Icons.person),
                             ),
-                      title: Text('${match.user.firstName} ${match.user.lastName}'),
+                      title: Text(
+                          '${match.user.firstName} ${match.user.lastName}'),
                       subtitle: Text(
                         'Similarity: ${(match.similarity * 100).toStringAsFixed(1)}% • ${match.commonMovies.length} common movies',
                       ),

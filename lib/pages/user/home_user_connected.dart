@@ -41,7 +41,8 @@ class _UserHomePageState extends State<UserHomePage> {
   }
 
   Future<List> fetchData(String endpoint) async {
-    final url = Uri.parse('https://api.themoviedb.org/3/$endpoint?api_key=$tmdbApiKey');
+    final url =
+        Uri.parse('https://api.themoviedb.org/3/$endpoint?api_key=$tmdbApiKey');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -60,7 +61,8 @@ class _UserHomePageState extends State<UserHomePage> {
         backgroundColor: Colors.black,
         title: const Text(
           'MovieApp',
-          style: TextStyle(color: Color(0xFF53FC18), fontWeight: FontWeight.bold),
+          style:
+              TextStyle(color: Color(0xFF53FC18), fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
@@ -84,29 +86,24 @@ class _UserHomePageState extends State<UserHomePage> {
         ],
       ),
       body: nowPlaying.isEmpty
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFF53FC18)))
+          ? const Center(
+              child: CircularProgressIndicator(color: Color(0xFF53FC18)))
           : SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   buildSectionTitle('Now Playing'),
                   movieHorizontalList(nowPlaying),
-
                   buildSectionTitle('Popular Movies'),
                   movieHorizontalList(popularMovies),
-
                   buildSectionTitle('Top Rated Movies'),
                   movieHorizontalList(topRatedMovies),
-
                   buildSectionTitle('On Air TV Shows'),
                   movieHorizontalList(onAirTv),
-
                   buildSectionTitle('Popular TV Shows'),
                   movieHorizontalList(popularTv),
-
                   buildSectionTitle('Top Rated TV Shows'),
                   movieHorizontalList(topRatedTv),
-
                   const SizedBox(height: 20),
                 ],
               ),
@@ -188,4 +185,3 @@ class _UserHomePageState extends State<UserHomePage> {
     );
   }
 }
-

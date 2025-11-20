@@ -43,7 +43,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         color: Color(0xFF53FC18),
                         fontWeight: FontWeight.bold)),
                 const SizedBox(height: 20),
-
                 GestureDetector(
                   onTap: () async {
                     final picker = ImagePicker();
@@ -58,22 +57,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     backgroundColor: Colors.grey,
                     backgroundImage: photo != null ? FileImage(photo!) : null,
                     child: photo == null
-                        ? const Icon(Icons.camera_alt,
-                            color: Color(0xFF53FC18))
+                        ? const Icon(Icons.camera_alt, color: Color(0xFF53FC18))
                         : null,
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                TextField(controller: firstCtrl, decoration: const InputDecoration(hintText: "First Name")),
-                TextField(controller: lastCtrl, decoration: const InputDecoration(hintText: "Last Name")),
-                TextField(controller: ageCtrl, keyboardType: TextInputType.number,
+                TextField(
+                    controller: firstCtrl,
+                    decoration: const InputDecoration(hintText: "First Name")),
+                TextField(
+                    controller: lastCtrl,
+                    decoration: const InputDecoration(hintText: "Last Name")),
+                TextField(
+                    controller: ageCtrl,
+                    keyboardType: TextInputType.number,
                     decoration: const InputDecoration(hintText: "Age")),
-                TextField(controller: emailCtrl, decoration: const InputDecoration(hintText: "Email")),
-                TextField(controller: passCtrl, obscureText: true,
+                TextField(
+                    controller: emailCtrl,
+                    decoration: const InputDecoration(hintText: "Email")),
+                TextField(
+                    controller: passCtrl,
+                    obscureText: true,
                     decoration: const InputDecoration(hintText: "Password")),
                 const SizedBox(height: 20),
-
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF53FC18),
@@ -85,7 +91,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           setState(() => loading = true);
 
                           try {
-                            final auth = Provider.of<AuthService>(context, listen: false);
+                            final auth = Provider.of<AuthService>(context,
+                                listen: false);
                             final user = await auth.register(
                               email: emailCtrl.text.trim(),
                               password: passCtrl.text.trim(),
@@ -98,7 +105,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             if (user != null && mounted) {
                               Navigator.pushReplacement(
                                 context,
-                                MaterialPageRoute(builder: (_) => const UserHomeScreen()),
+                                MaterialPageRoute(
+                                    builder: (_) => const UserHomeScreen()),
                               );
                             }
                           } catch (e) {

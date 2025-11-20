@@ -21,9 +21,7 @@ class WatchlistService {
 
   // Convenience wrappers for clarity when reading call sites
   static Future<void> addMovie(int id) => addToWatchlist(id, 'movie');
-  static Future<void> addTv(int id) => addToWatchlist(id, 'tv');
   static Future<void> removeMovie(int id) => removeFromWatchlist(id, 'movie');
-  static Future<void> removeTv(int id) => removeFromWatchlist(id, 'tv');
 
   /// Remove
   static Future<void> removeFromWatchlist(int id, String kind) async {
@@ -68,6 +66,6 @@ class WatchlistService {
     return list.contains('${kind}_$id');
   }
 
-  static Future<bool> isMovie(int id, String uid) => isInWatchlist(id, 'movie', uid);
-  static Future<bool> isTv(int id, String uid) => isInWatchlist(id, 'tv', uid);
+  static Future<bool> isMovie(int id, String uid) =>
+      isInWatchlist(id, 'movie', uid);
 }

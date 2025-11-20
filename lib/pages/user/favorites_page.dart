@@ -36,7 +36,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
       final favList = await WatchlistService.getWatchlistOnce(uid);
       setState(() => favoriteIds = favList.toList());
-      
+
       // Preload all items
       for (final fav in favoriteIds) {
         await _loadItem(fav);
@@ -44,7 +44,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
     } catch (e) {
       print('Error loading favorites: $e');
     }
-    
+
     setState(() => loading = false);
   }
 
@@ -53,7 +53,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
       // Parse "movie_123" or "tv_456"
       final parts = favTag.split('_');
       if (parts.length != 2) return;
-      
+
       final kind = parts[0];
       final id = int.tryParse(parts[1]);
       if (id == null) return;
@@ -79,13 +79,13 @@ class _FavoritesPageState extends State<FavoritesPage> {
     try {
       final parts = favTag.split('_');
       if (parts.length != 2) return;
-      
+
       final kind = parts[0];
       final id = int.tryParse(parts[1]);
       if (id == null) return;
 
       await WatchlistService.removeFromWatchlist(id, kind);
-      
+
       setState(() {
         favoriteIds.remove(favTag);
         itemCache.remove(favTag);
@@ -106,7 +106,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
         backgroundColor: Colors.black,
         title: const Text(
           'Favorites',
-          style: TextStyle(color: Color(0xFF53FC18), fontWeight: FontWeight.bold),
+          style:
+              TextStyle(color: Color(0xFF53FC18), fontWeight: FontWeight.bold),
         ),
       ),
       body: loading
@@ -193,7 +194,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
                                   colors: [
                                     Colors.transparent,
                                     Colors.black87,
-                              
                                   ],
                                 ),
                                 borderRadius: const BorderRadius.vertical(
