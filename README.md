@@ -45,3 +45,20 @@ For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 # movie_app
+
+## Watchlist (Movies & TV Shows)
+
+You can now add both Movies and TV Shows to your watchlist (stored as a `favorites` array in the `users` Firestore collection). Each entry is saved as a tag:
+
+```
+movie_<TMDB_ID>
+tv_<TMDB_ID>
+```
+
+Implementation details:
+- Service: `WatchlistService` with generic `addToWatchlist(id, kind)` plus convenience `addMovie`, `addTv`, `removeMovie`, `removeTv`.
+- UI: Reusable widget `WatchlistToggle` (`lib/widgets/watchlist_toggle.dart`) shows a heart icon and streams the current user's watchlist for live updates.
+- TV details page (`tv_details.dart`) refactored to use the new widget.
+
+To add watchlist support on another page, wrap each item with `WatchlistToggle(id: itemId, kind: 'movie')` or `kind: 'tv'`.
+

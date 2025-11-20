@@ -9,31 +9,32 @@ class TvService {
   static const imageBase = "https://image.tmdb.org/t/p/w500";
 
   static Future<List> onAir({int page = 1}) async =>
-      _get("$base/tv/on_the_air?api_key=$apiKey&language=fr-FR&page=$page");
+      _getList("$base/tv/on_the_air?api_key=$apiKey&language=fr-FR&page=$page");
 
   static Future<List> popular({int page = 1}) async =>
-      _get("$base/tv/popular?api_key=$apiKey&language=fr-FR&page=$page");
+      _getList("$base/tv/popular?api_key=$apiKey&language=fr-FR&page=$page");
 
   static Future<List> topRated({int page = 1}) async =>
-      _get("$base/tv/top_rated?api_key=$apiKey&language=fr-FR&page=$page");
+      _getList("$base/tv/top_rated?api_key=$apiKey&language=fr-FR&page=$page");
 
-  static Future<List> details(int id) async =>
-      _get("$base/tv/$id?api_key=$apiKey&language=fr-FR", listKey: "seasons");
+  // FIX: Return full TV details Map instead of just seasons list.
+  static Future<Map<String, dynamic>> details(int id) async =>
+      _getMap("$base/tv/$id?api_key=$apiKey&language=fr-FR");
 
   static Future<List> credits(int id) async =>
-      _get("$base/tv/$id/aggregate_credits?api_key=$apiKey&language=fr-FR", listKey: "cast");
+      _getList("$base/tv/$id/aggregate_credits?api_key=$apiKey&language=fr-FR", listKey: "cast");
 
   static Future<List> similar(int id) async =>
-      _get("$base/tv/$id/similar?api_key=$apiKey&language=fr-FR");
+      _getList("$base/tv/$id/similar?api_key=$apiKey&language=fr-FR");
 
-  static Future<Map> seasonDetails(int id, int season) async =>
+  static Future<Map<String, dynamic>> seasonDetails(int id, int season) async =>
       _getMap("$base/tv/$id/season/$season?api_key=$apiKey&language=fr-FR");
 
   static Future<List> search(String q, {int page = 1}) async =>
-      _get("$base/search/tv?api_key=$apiKey&query=${Uri.encodeComponent(q)}&language=fr-FR&page=$page");
+      _getList("$base/search/tv?api_key=$apiKey&query=${Uri.encodeComponent(q)}&language=fr-FR&page=$page");
 
   // Helpers
-  static Future<List> _get(String url, {String listKey = "results"}) async {
+  static Future<List> _getList(String url, {String listKey = "results"}) async {
     try {
       final res = await http.get(Uri.parse(url));
       if (res.statusCode == 200) {
@@ -46,7 +47,7 @@ class TvService {
     return [];
   }
 
-  static Future<Map> _getMap(String url) async {
+  static Future<Map<String, dynamic>> _getMap(String url) async {
     try {
       final res = await http.get(Uri.parse(url));
       if (res.statusCode == 200) {

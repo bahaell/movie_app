@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/tv_service.dart';
 import '../../services/watchlist_service.dart';
+import '../../widgets/watchlist_toggle.dart';
 import 'season_details.dart';
 
 const String baseImg = 'https://image.tmdb.org/t/p/w500';
@@ -19,7 +20,7 @@ class _TvDetailsPageState extends State<TvDetailsPage> {
   List cast = [];
   List similar = [];
   bool loading = true;
-  bool isFav = false;
+  bool isFav = false; // maintained for Hero tag legacy; actual toggle handled by WatchlistToggle
   String favTag = '';
 
   @override
@@ -31,22 +32,21 @@ class _TvDetailsPageState extends State<TvDetailsPage> {
 
   Future<void> _load() async {
     setState(() => loading = true);
-    final d = await TvService.details(widget.tvId);
+  final d = await TvService.details(widget.tvId);
     final c = await TvService.credits(widget.tvId);
     final s = await TvService.similar(widget.tvId);
 
-    // check watchlist
+    // check watchlist initial (widget will live update)
     try {
       final uid = FirebaseAuth.instance.currentUser!.uid;
       final wl = await WatchlistService.getWatchlistOnce(uid);
-      final fav = wl.contains(favTag);
-      setState(() => isFav = fav);
+      isFav = wl.contains(favTag);
     } catch (e) {
-      print('Error loading watchlist: $e');
+      // ignore
     }
 
     setState(() {
-      details = d as Map<String, dynamic>?;
+      details = d; // already a Map<String, dynamic>
       cast = c;
       similar = s;
       loading = false;
@@ -93,23 +93,13 @@ class _TvDetailsPageState extends State<TvDetailsPage> {
                 Expanded(
                   child: Text(details!['name'] ?? '', style: const TextStyle(color: Color(0xFF53FC18), fontSize: 22, fontWeight: FontWeight.bold)),
                 ),
-                IconButton(
-                  onPressed: () async {
-                    try {
-                      final uid = FirebaseAuth.instance.currentUser!.uid;
-                      if (!isFav) {
-                        await WatchlistService.addToWatchlist(widget.tvId, 'tv');
-                      } else {
-                        await WatchlistService.removeFromWatchlist(widget.tvId, 'tv');
-                      }
-                      final wl = await WatchlistService.getWatchlistOnce(uid);
-                      setState(() => isFav = wl.contains(favTag));
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
-                    }
-                  },
-                  icon: Icon(isFav ? Icons.favorite : Icons.favorite_border, color: const Color(0xFF53FC18)),
-                )
+                WatchlistToggle(id: widget.tvId, kind: 'tv', onChanged: () async {
+                  final uid = FirebaseAuth.instance.currentUser?.uid;
+                  if (uid != null) {
+                    final wl = await WatchlistService.getWatchlistOnce(uid);
+                    setState(() => isFav = wl.contains(favTag));
+                  }
+                })
               ],
             ),
             const SizedBox(height: 8),

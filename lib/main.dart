@@ -36,18 +36,29 @@ void main() async {
   // If running on the web we must provide FirebaseOptions. For mobile
   // (Android/iOS) the native configuration files (google-services.json /
   // GoogleService-Info.plist) are used and no options are required here.
-  final firebaseOptionsForWeb = FirebaseOptions(
-    apiKey: dotenv.env['FIREBASE_API_KEY']!,
-    authDomain: dotenv.env['FIREBASE_AUTH_DOMAIN']!,
-    projectId: dotenv.env['FIREBASE_PROJECT_ID']!,
-    storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET']!,
-    messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
-    appId: dotenv.env['FIREBASE_APP_ID']!,
-    measurementId: dotenv.env['FIREBASE_MEASUREMENT_ID']!,
-  );
+  final hasFirebaseWebConfig = kIsWeb &&
+      dotenv.env['FIREBASE_API_KEY'] != null &&
+      dotenv.env['FIREBASE_AUTH_DOMAIN'] != null &&
+      dotenv.env['FIREBASE_PROJECT_ID'] != null &&
+      dotenv.env['FIREBASE_STORAGE_BUCKET'] != null &&
+      dotenv.env['FIREBASE_MESSAGING_SENDER_ID'] != null &&
+      dotenv.env['FIREBASE_APP_ID'] != null &&
+      dotenv.env['FIREBASE_MEASUREMENT_ID'] != null;
 
-  if (kIsWeb) {
+  if (kIsWeb && hasFirebaseWebConfig) {
+    final firebaseOptionsForWeb = FirebaseOptions(
+      apiKey: dotenv.env['FIREBASE_API_KEY']!,
+      authDomain: dotenv.env['FIREBASE_AUTH_DOMAIN']!,
+      projectId: dotenv.env['FIREBASE_PROJECT_ID']!,
+      storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET']!,
+      messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
+      appId: dotenv.env['FIREBASE_APP_ID']!,
+      measurementId: dotenv.env['FIREBASE_MEASUREMENT_ID']!,
+    );
     await Firebase.initializeApp(options: firebaseOptionsForWeb);
+  } else if (kIsWeb && !hasFirebaseWebConfig) {
+    // Skip Firebase init on web if config missing to allow UI to load.
+    debugPrint('Firebase web configuration missing; skipping initialization. Provide keys in .env to enable auth/storage.');
   } else {
     await Firebase.initializeApp();
   }
