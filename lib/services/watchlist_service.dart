@@ -5,14 +5,20 @@ class WatchlistService {
   static CollectionReference usersRef = FirebaseFirestore.instance.collection('users');
 
   static Future<void> addToWatchlist(String movieId) async {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      throw StateError('User not authenticated');
+    }
     await usersRef.doc(uid).update({
       'favorites': FieldValue.arrayUnion([movieId])
     });
   }
 
   static Future<void> removeFromWatchlist(String movieId) async {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      throw StateError('User not authenticated');
+    }
     await usersRef.doc(uid).update({
       'favorites': FieldValue.arrayRemove([movieId])
     });

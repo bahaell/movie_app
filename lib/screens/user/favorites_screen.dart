@@ -8,8 +8,15 @@ class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});
   @override
   Widget build(BuildContext context) {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final user = FirebaseAuth.instance.currentUser;
     final svc = FirebaseMovieService();
+    if (user == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('My Watchlist')),
+        body: const Center(child: Text('Please sign in to view your watchlist')),
+      );
+    }
+    final uid = user.uid;
     return Scaffold(
       appBar: AppBar(title: const Text('My Watchlist')),
       body: StreamBuilder<List<String>>(

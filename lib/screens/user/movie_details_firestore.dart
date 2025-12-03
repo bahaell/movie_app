@@ -43,9 +43,14 @@ class _MovieDetailsFirestoreState extends State<MovieDetailsFirestore> {
     movie = m;
 
     // check fav
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-    final wl = await WatchlistService.getWatchlistOnce(uid);
-    isFav = wl.contains(widget.movieId);
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      // user is not authenticated anymore (possible during logout)
+      isFav = false;
+    } else {
+      final wl = await WatchlistService.getWatchlistOnce(uid);
+      isFav = wl.contains(widget.movieId);
+    }
 
     // get similar: use genres if present, else search by first word
     List<Movie> found = [];
@@ -84,14 +89,22 @@ class _MovieDetailsFirestoreState extends State<MovieDetailsFirestore> {
   }
 
   Future<void> _toggleFav() async {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-    if (isFav) {
-      await WatchlistService.removeFromWatchlist(widget.movieId);
-    } else {
-      await WatchlistService.addToWatchlist(widget.movieId);
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      // user logged out, do nothing
+      return;
     }
-    final wl = await WatchlistService.getWatchlistOnce(uid);
-    if (mounted) setState(() => isFav = wl.contains(widget.movieId));
+    try {
+      if (isFav) {
+        await WatchlistService.removeFromWatchlist(widget.movieId);
+      } else {
+        await WatchlistService.addToWatchlist(widget.movieId);
+      }
+      final wl = await WatchlistService.getWatchlistOnce(uid);
+      if (mounted) setState(() => isFav = wl.contains(widget.movieId));
+    } catch (_) {
+      // ignore service errors (could be caused by concurrent logout)
+    }
   }
 
   @override

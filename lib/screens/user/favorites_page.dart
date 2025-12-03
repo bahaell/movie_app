@@ -17,7 +17,16 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(backgroundColor: Colors.black, title: const Text('Mes Favoris', style: TextStyle(color: PRIMARY_GREEN))),
+        body: const Center(child: Text('Veuillez vous connecter pour voir vos favoris', style: TextStyle(color: PRIMARY_GREEN))),
+      );
+    }
+
+    final uid = user.uid;
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(backgroundColor: Colors.black, title: const Text('Mes Favoris', style: TextStyle(color: PRIMARY_GREEN))),
@@ -55,7 +64,11 @@ class _FavoritesPageState extends State<FavoritesPage> {
                       trailing: IconButton(
                         icon: const Icon(Icons.delete, color: PRIMARY_GREEN),
                         onPressed: () async {
-                          await WatchlistService.removeFromWatchlist(movie.id);
+                          try {
+                            await WatchlistService.removeFromWatchlist(movie.id);
+                          } catch (_) {
+                            // ignore - user might have been logged out concurrently
+                          }
                         },
                       ),
                     ),
