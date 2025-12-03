@@ -4,6 +4,7 @@ import '../../core/constants.dart';
 import '../../models/movie.dart';
 import '../../services/firebase_movie_service.dart';
 import '../../widgets/movie_card.dart';
+import '../../widgets/search_view.dart';
 import 'movie_details_firestore.dart';
 
 class SearchPageUser extends StatefulWidget {
@@ -50,79 +51,45 @@ class _SearchPageUserState extends State<SearchPageUser> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: SURFACE_DARK,
-      appBar: AppBar(
-        backgroundColor: SURFACE_DARK,
-        title: const Text('Search', style: TextStyle(color: PRIMARY_GREEN)),
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(14),
-            child: TextField(
-              controller: _controller,
-              onSubmitted: (_) => searchMovies(),
-              decoration: InputDecoration(
-                hintText: 'Search movie...',
-                hintStyle: const TextStyle(color: Colors.white54),
-                filled: true,
-                fillColor: Colors.grey.shade800,
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.search, color: PRIMARY_GREEN),
-                  onPressed: searchMovies,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              style: const TextStyle(color: Colors.white),
-              onChanged: (value) {
-                if (value.isEmpty) {
-                  setState(() => results = []);
-                }
+    return SearchView(
+      controller: _controller,
+      onSearchPressed: searchMovies,
+      onChanged: (v) {
+        if (v.isEmpty) setState(() => results = []);
+      },
+      loading: loading,
+      results: results,
+      hintText: 'Search movie...',
+      contentBuilder: (context, results, loading, controller) {
+        if (loading) {
+          return const Center(child: CircularProgressIndicator(color: PRIMARY_GREEN));
+        }
+        if (results.isEmpty && controller.text.isNotEmpty) {
+          return const Center(child: Text('Aucun film trouvé', style: TextStyle(color: Colors.white70)));
+        }
+        return GridView.builder(
+          padding: const EdgeInsets.all(12),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: .65,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+          ),
+          itemCount: results.length,
+          itemBuilder: (_, i) {
+            final movie = results[i];
+            return MovieCard(
+              movie: movie,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => MovieDetailsFirestore(movieId: movie.id)),
+                );
               },
-            ),
-          ),
-          Expanded(
-            child: loading
-                ? const Center(
-                    child: CircularProgressIndicator(color: PRIMARY_GREEN),
-                  )
-                : results.isEmpty && _controller.text.isNotEmpty
-                    ? const Center(
-                        child: Text(
-                          'Aucun film trouvé',
-                          style: TextStyle(color: Colors.white70),
-                        ),
-                      )
-                    : GridView.builder(
-                        padding: const EdgeInsets.all(12),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: .65,
-                          mainAxisSpacing: 12,
-                          crossAxisSpacing: 12,
-                        ),
-                        itemCount: results.length,
-                        itemBuilder: (_, i) {
-                          final movie = results[i];
-                          return MovieCard(
-                            movie: movie,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => MovieDetailsFirestore(movieId: movie.id),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-          ),
-        ],
-      ),
+            );
+          },
+        );
+      },
     );
   }
 }
