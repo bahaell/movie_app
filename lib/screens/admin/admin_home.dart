@@ -22,45 +22,6 @@ class _AdminHomePageState extends State<AdminHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Drawer(
-        backgroundColor: Colors.black,
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text('Admin Menu', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: PRIMARY_GREEN)),
-              ),
-              ListTile(
-                leading: const Icon(Icons.cloud_download, color: PRIMARY_GREEN),
-                title: const Text('Import TMDB', style: TextStyle(color: Colors.white)),
-                onTap: () { Navigator.pop(context); setState(()=> _idx = 0); },
-              ),
-              ListTile(
-                leading: const Icon(Icons.video_library, color: PRIMARY_GREEN),
-                title: const Text('Library', style: TextStyle(color: Colors.white)),
-                onTap: () { Navigator.pop(context); setState(()=> _idx = 1); },
-              ),
-              ListTile(
-                leading: const Icon(Icons.people, color: PRIMARY_GREEN),
-                title: const Text('Users', style: TextStyle(color: Colors.white)),
-                onTap: () { Navigator.pop(context); setState(()=> _idx = 2); },
-              ),
-              const Divider(color: Colors.white24),
-              ListTile(
-                leading: const Icon(Icons.logout, color: Colors.redAccent),
-                title: const Text('Logout', style: TextStyle(color: Colors.redAccent)),
-                onTap: () async {
-                  await FirebaseAuth.instance.signOut();
-                  if (!context.mounted) return;
-                  Navigator.of(context).pushNamedAndRemoveUntil('/login', (r) => false);
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
       appBar: AppBar(
         title: const Text('Admin Panel', style: TextStyle(color: PRIMARY_GREEN)),
         backgroundColor: Colors.black,
