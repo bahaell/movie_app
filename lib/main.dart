@@ -1,97 +1,89 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'screens/login_page.dart';
-import 'screens/register_page.dart';
-import 'screens/home_user_page.dart';
-import 'screens/favorites_page.dart';
-import 'screens/admin/admin_home_page.dart';
-import 'pages/user/search_page.dart';
-import 'pages/user/movie_details.dart';
-import 'pages/user/tv_details.dart';
-import 'pages/user/home_user_connected.dart';
-import 'pages/user/matching_page.dart';
-import 'app_theme.dart';
+import 'core/firebase_options.dart';
+import 'package:provider/provider.dart';
+import 'core/app_theme.dart';
+import 'providers/auth_provider.dart';
+import 'providers/movie_provider.dart';
+import 'providers/admin_provider.dart';
+import 'providers/admin_movie_provider.dart';
+import 'providers/admin_user_provider.dart';
+import 'providers/search_provider.dart';
+import 'providers/movie_details_provider.dart';
+import 'providers/discovery_provider.dart';
+import 'screens/auth/login_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
+import 'screens/admin/admin_home.dart';
+import 'screens/admin/admin_main.dart';
+import 'screens/user/user_main.dart';
+import 'screens/user/search_screen.dart';
+import 'screens/user/favorites_screen.dart';
+import 'screens/user/movie_details_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Load environment variables from .env (do NOT commit the real .env)
-  // On web, the .env file must be in the web/ folder to be accessible
-  try {
-    if (kIsWeb) {
-      // For web, try loading from the web root
-      await dotenv.load(fileName: '.env');
-    } else {
-      // For mobile, load from project root
-      await dotenv.load(fileName: '.env');
-    }
-  } catch (e) {
-    print('Warning: Could not load .env file: $e');
-    // Continue anyway — fallback values will be used
-  }
-
-  // If running on the web we must provide FirebaseOptions. For mobile
-  // (Android/iOS) the native configuration files (google-services.json /
-  // GoogleService-Info.plist) are used and no options are required here.
-  final hasFirebaseWebConfig = kIsWeb &&
-      dotenv.env['FIREBASE_API_KEY'] != null &&
-      dotenv.env['FIREBASE_AUTH_DOMAIN'] != null &&
-      dotenv.env['FIREBASE_PROJECT_ID'] != null &&
-      dotenv.env['FIREBASE_STORAGE_BUCKET'] != null &&
-      dotenv.env['FIREBASE_MESSAGING_SENDER_ID'] != null &&
-      dotenv.env['FIREBASE_APP_ID'] != null &&
-      dotenv.env['FIREBASE_MEASUREMENT_ID'] != null;
-
-  if (kIsWeb && hasFirebaseWebConfig) {
-    final firebaseOptionsForWeb = FirebaseOptions(
-      apiKey: dotenv.env['FIREBASE_API_KEY']!,
-      authDomain: dotenv.env['FIREBASE_AUTH_DOMAIN']!,
-      projectId: dotenv.env['FIREBASE_PROJECT_ID']!,
-      storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET']!,
-      messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
-      appId: dotenv.env['FIREBASE_APP_ID']!,
-      measurementId: dotenv.env['FIREBASE_MEASUREMENT_ID']!,
-    );
-    await Firebase.initializeApp(options: firebaseOptionsForWeb);
-  } else if (kIsWeb && !hasFirebaseWebConfig) {
-    // Skip Firebase init on web if config missing to allow UI to load.
-    debugPrint('Firebase web configuration missing; skipping initialization. Provide keys in .env to enable auth/storage.');
-  } else {
-    await Firebase.initializeApp();
-  }
-
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: [
+    ChangeNotifierProvider(create: (_) => AuthProvider()),
+    ChangeNotifierProvider(create: (_) => MovieProvider()),
+    ChangeNotifierProvider(create: (_) => SearchProvider()),
+    ChangeNotifierProvider(create: (_) => MovieDetailsProvider()),
+    ChangeNotifierProvider(create: (_) => DiscoveryProvider()),
+    ChangeNotifierProvider(create: (_) => AdminProvider()),
+    ChangeNotifierProvider(create: (_) => AdminMovieProvider()),
+    ChangeNotifierProvider(create: (_) => AdminUserProvider()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: appTheme(),
+        routes: {
+          '/login': (_) => const LoginScreen(),
+          '/admin': (_) => const AdminHomePage(),
+          '/search': (_) => const SearchScreen(),
+          '/favorites': (_) => const FavoritesScreen(),
+          '/details': (_) => const MovieDetailsScreen(),
+        },
+        home: const Root(),
+      ),
+    );
+  }
+}
+
+class Root extends StatelessWidget {
+  const Root({super.key});
+
+  Future<bool> _checkUserRole(BuildContext context, String uid) {
+    return Provider.of<AuthProvider>(context, listen: false).isAdmin(uid);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/login',
-      theme: AppTheme.lightTheme,
-      routes: {
-        '/login': (context) => const LoginPage(),
-        '/register': (context) => const RegisterPage(),
-        '/user': (context) => const HomeUserPage(),
-        '/user_connected': (context) => const UserHomePage(),
-        '/favorites': (context) => const FavoritesPage(),
-        '/matching': (context) => const MatchingPage(),
-        '/admin': (context) => const AdminHomePage(),
-        '/search': (context) => const SearchPage(),
-        '/movie': (context) {
-          final id = ModalRoute.of(context)!.settings.arguments as int;
-          return MovieDetailsPage(movieId: id);
-        },
-        '/tv': (context) {
-          final id = ModalRoute.of(context)!.settings.arguments as int;
-          return TvDetailsPage(tvId: id);
-        },
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snap) {
+        if (!snap.hasData) return const LoginScreen();
+        final user = snap.data!;
+        return FutureBuilder<bool>(
+          future: _checkUserRole(context, user.uid),
+          builder: (context, asnap) {
+            if (!asnap.hasData) {
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            }
+            return asnap.data == true ? const AdminMain() : const UserMain();
+          },
+        );
       },
     );
   }
 }
+
