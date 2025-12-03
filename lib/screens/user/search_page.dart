@@ -53,6 +53,7 @@ class _SearchPageUserState extends State<SearchPageUser> {
   Widget build(BuildContext context) {
     return SearchView(
       controller: _controller,
+      fieldInAppBar: false,
       onSearchPressed: searchMovies,
       onChanged: (v) {
         if (v.isEmpty) setState(() => results = []);
